@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Shop — ECHO & AIR</title>
+<link rel="stylesheet" href="echo and air.css" />
+</head>
+<body data-page="shop">
+
+<header class="nav">
+  <div class="wrap">
+    <a href="index.html" class="nav__logo">ECHO<span>& AIR</span></a>
+    <nav class="nav__links">
+      <a href="shop.html" class="is-active">Shop</a>
+      <a href="drops.html">Drops</a>
+      <a href="shop.html?filter=sale">Sale</a>
+      <a href="shop.html?filter=new">New</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav__right">
+      <a href="wishlist.html" class="nav__icon" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 21s-7.5-4.6-10-9.1C.4 8.6 2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5 18 5 19.6 8.6 22 11.9 19.5 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="nav__count is-hidden" data-wishlist-count>0</span>
+      </a>
+      <button class="nav__burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="page-hero">
+  <div class="wrap">
+    <p class="crumb"><a href="index.html">Home</a> / Shop</p>
+    <h1 class="h-lg" style="margin-top:14px;" id="shop-title">All Products</h1>
+  </div>
+</section>
+
+<section class="section" style="padding-top:40px;">
+  <div class="wrap">
+    <div class="filter-row" id="filter-row">
+      <button class="tab" data-filter="all">All</button>
+      <button class="tab" data-filter="new">New</button>
+      <button class="tab" data-filter="sale">Sale</button>
+      <button class="tab" data-filter="grail">Grails</button>
+    </div>
+    <div class="product-grid" id="shop-grid"></div>
+    <div class="empty-state" id="shop-empty" style="display:none;">
+      <h3>Nothing here yet</h3>
+      <p>Try a different filter or check back for the next drop.</p>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div>
+        <div class="footer__logo">ECHO<span>& AIR</span></div>
+        <p style="font-size:13px;color:var(--ink-faint);">Clothing store</p>
+      </div>
+      <div>
+        <h4>Contact Us</h4>
+        <address>ECHO Studio<br>12 Forge Lane, Riverton<br>Fictionland 00000</address>
+        <a href="mailto:hello@raw.example" class="mail">hello@ehoandair.example</a>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <nav><ul>
+          <li><a href="shop.html">All</a></li>
+          <li><a href="drops.html">Drops</a></li>
+          <li><a href="shop.html?filter=new">New</a></li>
+          <li><a href="shop.html?filter=sale">Sale</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul></nav>
+      </div>
+      <div>
+        <h4>Stay Fresh</h4>
+        <p style="font-size:14px;color:var(--ink-dim);">Join to receive exclusive offers and 15% off your first order.</p>
+        <form class="newsletter-form" data-newsletter>
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 ECHO & AIR Clothing Store</span>
+      <div class="footer__socials">
+        <a href="https://x.com" target="_blank" rel="noopener">X</a>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="footer__legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const initialFilter = params.get("filter") || "all";
+
+  function applyFilter(filter) {
+    document.querySelectorAll("[data-filter]").forEach(b => b.classList.toggle("is-active", b.dataset.filter === filter));
+    const list = filter === "all" ? PRODUCTS : productsByTag(filter);
+    renderInto("#shop-grid", list);
+    document.querySelector("#shop-empty").style.display = list.length ? "none" : "block";
+    document.querySelector("#shop-title").textContent =
+      filter === "all" ? "All Products" : filter === "new" ? "New Arrivals" : filter === "sale" ? "Sale" : "Grails";
+  }
+
+  document.querySelectorAll("[data-filter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      applyFilter(btn.dataset.filter);
+      history.replaceState(null, "", btn.dataset.filter === "all" ? "shop.html" : `shop.html?filter=${btn.dataset.filter}`);
+    });
+  });
+
+  applyFilter(initialFilter);
+</script>
+</body>
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title id="page-title">Drop — ECHO & AIR</title>
+<link rel="stylesheet" href="echo and air.css" />
+</head>
+<body data-page="drop">
+
+<header class="nav">
+  <div class="wrap">
+    <a href="index.html" class="nav__logo">ECHO<span>& AIR</span></a>
+    <nav class="nav__links">
+      <a href="shop.html">Shop</a>
+      <a href="drops.html" class="is-active">Drops</a>
+      <a href="shop.html?filter=sale">Sale</a>
+      <a href="shop.html?filter=new">New</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav__right">
+      <a href="wishlist.html" class="nav__icon" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 21s-7.5-4.6-10-9.1C.4 8.6 2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5 18 5 19.6 8.6 22 11.9 19.5 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="nav__count is-hidden" data-wishlist-count>0</span>
+      </a>
+      <button class="nav__burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<div id="drop-root"></div>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div>
+        <div class="footer__logo">ECHO<span>& AIR</span></div>
+        <p style="font-size:13px;color:var(--ink-faint);">Clothing store</p>
+      </div>
+      <div>
+        <h4>Contact Us</h4>
+        <address>ECHO Studio<br>12 Forge Lane, Riverton<br>Fictionland 00000</address>
+        <a href="mailto:hello@raw.example" class="mail">hello@echo.example</a>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <nav><ul>
+          <li><a href="shop.html">All</a></li>
+          <li><a href="drops.html">Drops</a></li>
+          <li><a href="shop.html?filter=new">New</a></li>
+          <li><a href="shop.html?filter=sale">Sale</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul></nav>
+      </div>
+      <div>
+        <h4>Stay Fresh</h4>
+        <p style="font-size:14px;color:var(--ink-dim);">Join to receive exclusive offers and 15% off your first order.</p>
+        <form class="newsletter-form" data-newsletter>
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 ECHO & AIR Clothing Store</span>
+      <div class="footer__socials">
+        <a href="https://x.com" target="_blank" rel="noopener">X</a>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="footer__legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  const slug = new URLSearchParams(location.search).get("slug");
+  const drop = findDrop(slug);
+  const root = document.querySelector("#drop-root");
+
+  if (!drop) {
+    root.innerHTML = `<div class="wrap empty-state"><h3>Drop not found</h3><p>This collab may have sold through.</p><a href="drops.html" class="btn" style="margin-top:20px;">Back to Drops</a></div>`;
+  } else {
+    document.title = `${drop.name} — RAWLINE`;
+    root.innerHTML = `
+      <section class="hero" style="min-height:70vh;">
+        <div class="hero__bg"><img src="${productImg(drop.seed, 1920, 1400)}" alt="${drop.name}" /></div>
+        <div class="hero__content wrap" style="padding-bottom:56px;">
+          <p class="crumb" style="margin-bottom:18px;"><a href="index.html">Home</a> / <a href="drops.html">Drops</a> / ${drop.name}</p>
+          <h1 class="h-xl" style="font-size:clamp(36px,7vw,84px);">${drop.name}</h1>
+          <p class="body-dim" style="max-width:52ch;font-size:17px;margin-top:18px;">${drop.tagline}</p>
+        </div>
+      </section>
+      <section class="section">
+        <div class="wrap about-page__body">
+          <p class="eyebrow">The Story</p>
+          <p style="margin-top:16px;">${drop.body}</p>
+        </div>
+      </section>
+      <section class="section" style="border-top:1px solid var(--line);">
+        <div class="wrap">
+          <div class="section-head"><h2 class="h-lg">Shop The Drop</h2></div>
+          <div class="product-grid" id="drop-products"></div>
+        </div>
+      </section>`;
+    renderInto("#drop-products", drop.pieces.map(findProduct).filter(Boolean));
+  }
+</script>
+</body>
+</html>

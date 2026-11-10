@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Echo & Air — Unfiltered Streetwear</title>
+<meta name="description" content="RAWLINE | Unfiltered, high-contrast streetwear. Shop premium collections and exclusive drops for those who make a statement." />
+<link rel="stylesheet" href="echo and air.css" />
+</head>
+<body data-page="home">
+
+<header class="nav">
+  <div class="wrap">
+    <a href="index.html" class="nav__logo">ECHO<span>& AIR</span></a>
+    <nav class="nav__links">
+      <a href="shop.html" class="is-active">Shop</a>
+      <a href="drops.html">Drops</a>
+      <a href="shop.html?filter=sale">Sale</a>
+      <a href="shop.html?filter=new">New</a>
+      <a href="about.html">About</a>
+    </nav>
+    <div class="nav__right">
+      <a href="wishlist.html" class="nav__icon" aria-label="Wishlist">
+        <svg viewBox="0 0 24 24" width="20" height="20"><path d="M12 21s-7.5-4.6-10-9.1C.4 8.6 2 5 5.6 5c2 0 3.4 1 4.4 2.5C11 6 12.4 5 14.4 5 18 5 19.6 8.6 22 11.9 19.5 16.4 12 21 12 21z" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>
+        <span class="nav__count is-hidden" data-wishlist-count>0</span>
+      </a>
+      <button class="nav__burger" aria-label="Menu" aria-expanded="false"><span></span><span></span><span></span></button>
+    </div>
+  </div>
+</header>
+
+<section class="hero">
+  <div class="hero__bg">
+    <img src="https://picsum.photos/seed/raw-hero-main/1920/2400" alt="Three friends in bold streetwear" />
+  </div>
+  <div class="hero__content">
+    <div class="wrap">
+      <p class="eyebrow hero__eyebrow">Dress the unconventional</p>
+      <h1 class="h-xl hero__title">Wear the<br>hype "raw"</h1>
+    </div>
+    <div class="marquee">
+      <div class="marquee__track">
+        <a href="product.html?slug=long-sleeve-shirt">Long Sleeve Shirt</a>
+        <a href="product.html?slug=socks-sky">Sky Socks</a>
+        <a href="product.html?slug=wide-jeans">Wide Jeans</a>
+        <a href="product.html?slug=long-sleeve-shirt">Long Sleeve Shirt</a>
+        <a href="product.html?slug=socks-sky">Sky Socks</a>
+        <a href="product.html?slug=wide-jeans">Wide Jeans</a>
+        <a href="product.html?slug=long-sleeve-shirt">Long Sleeve Shirt</a>
+        <a href="product.html?slug=socks-sky">Sky Socks</a>
+        <a href="product.html?slug=wide-jeans">Wide Jeans</a>
+      </div>
+    </div>
+    <div class="hero__cta wrap">
+      <a href="shop.html" class="btn btn-solid">Shop Now</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap about" data-reveal>
+    <div class="about__media">
+      <img src="https://picsum.photos/seed/raw-about/1200/900" alt="Friends in winter streetwear" />
+    </div>
+    <div class="about__copy">
+      <p class="eyebrow">Us</p>
+      <h2 class="h-lg">About</h2>
+      <p>ECHO & AIR is more than clothing, it's a movement. Born from the streets, driven by culture, and made for trendsetters. Bold drops, exclusive collabs, and fearless energy define those who stay fresh.</p>
+      <a href="about.html" class="link-arrow">View More →</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" data-reveal>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Latest</p>
+        <h2 class="h-lg section-head__title">Drops</h2>
+      </div>
+      <a href="drops.html" class="link-arrow">View All →</a>
+    </div>
+    <div class="drops-grid" id="home-drops"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" data-reveal>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Black Friday</p>
+        <h2 class="h-lg section-head__title">Sale</h2>
+      </div>
+      <a href="shop.html?filter=sale" class="link-arrow">View All →</a>
+    </div>
+    <div class="h-scroll" id="home-sale"></div>
+  </div>
+</section>
+
+<section class="section" style="border-top:1px solid var(--line);border-bottom:1px solid var(--line);">
+  <div class="wrap why-grid" data-reveal>
+    <div class="why-card">
+      <small>01</small>
+      <h3>Fast Shipping</h3>
+      <p class="body-dim">Get your order delivered quickly, straight to your door. 3–5 business days.</p>
+    </div>
+    <div class="why-card">
+      <small>02</small>
+      <h3>Easy Returns</h3>
+      <p class="body-dim">Return your items hassle-free. 7 days from delivery.</p>
+    </div>
+    <div class="why-card">
+      <small>03</small>
+      <h3>Secure Payments</h3>
+      <p class="body-dim">Pay with confidence. Bank-grade SSL protection.</p>
+    </div>
+    <div class="why-card">
+      <small>04</small>
+      <h3>Support</h3>
+      <p class="body-dim">Our dedicated team is here for you. Hello@raw.example</p>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" data-reveal>
+    <div class="section-head">
+      <h2 class="h-lg">Categories</h2>
+      <a href="shop.html" class="link-arrow">Shop All →</a>
+    </div>
+    <div class="cat-grid" id="home-categories"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap grails" data-reveal>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">Holy</p>
+        <h2 class="h-lg section-head__title">Grails</h2>
+      </div>
+      <a href="shop.html?filter=grail" class="link-arrow">View All →</a>
+    </div>
+    <div class="h-scroll grails__row" id="home-grails"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" data-reveal>
+    <div class="section-head">
+      <div>
+        <p class="eyebrow">New</p>
+        <h2 class="h-lg section-head__title">Arrivals</h2>
+      </div>
+      <a href="shop.html?filter=new" class="link-arrow">View All →</a>
+    </div>
+    <div class="tabs">
+      <button class="tab is-active" data-tab="men">Men</button>
+      <button class="tab" data-tab="women">Women</button>
+    </div>
+    <div class="product-grid" id="home-arrivals"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" data-reveal>
+    <div class="section-head">
+      <p class="eyebrow">Wall</p>
+    </div>
+    <h2 class="h-lg" style="margin-bottom:36px;">Social</h2>
+    <div class="social-grid" id="home-social"></div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap gift" data-reveal>
+    <div class="gift__copy">
+      <p class="eyebrow">Gift Card</p>
+      <h2 class="h-lg">ECHO & AIR</h2>
+      <p>Not sure what to grab? Keep it real with the ECHO & AIR Gift Card. From exclusive drops to everyday fits, let them choose their vibe. It's more than a gift, it's their pass into the RAW world.</p>
+      <a href="product.html?slug=raw-gift-card" class="btn btn-solid">Get Now</a>
+    </div>
+    <div class="gift__media">
+      <img src="https://picsum.photos/seed/raw-gift/900/700" alt="RAWLINE gift card" />
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="wrap" data-reveal>
+    <p class="eyebrow" style="margin-bottom:14px;">Walk-in</p>
+    <h2 class="h-lg" style="margin-bottom:32px;">Stores</h2>
+    <div class="store-grid" id="home-stores"></div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="wrap">
+    <div class="footer__top">
+      <div>
+        <div class="footer__logo">ECHO<span>& AIR</span></div>
+        <p style="font-size:13px;color:var(--ink-faint);">Clothing store</p>
+      </div>
+      <div>
+        <h4>Contact Us</h4>
+        <address>ECHO AIR Studio<br>12 Forge Lane, Riverton<br>Fictionland 00000</address>
+        <a href="mailto:hello@raw.example" class="mail">hello@echoandair.example</a>
+      </div>
+      <div>
+        <h4>Shop</h4>
+        <nav><ul>
+          <li><a href="shop.html">All</a></li>
+          <li><a href="drops.html">Drops</a></li>
+          <li><a href="shop.html?filter=new">New</a></li>
+          <li><a href="shop.html?filter=sale">Sale</a></li>
+          <li><a href="about.html">About</a></li>
+        </ul></nav>
+      </div>
+      <div>
+        <h4>Stay Fresh</h4>
+        <p style="font-size:14px;color:var(--ink-dim);">Join to receive exclusive offers and 15% off your first order.</p>
+        <form class="newsletter-form" data-newsletter>
+          <input type="email" placeholder="Your email address" required />
+          <button type="submit">Send</button>
+        </form>
+      </div>
+    </div>
+    <div class="footer__bottom">
+      <span>© 2026 ECHO & AIR Clothing Store</span>
+      <div class="footer__socials">
+        <a href="https://x.com" target="_blank" rel="noopener">X</a>
+        <a href="https://www.facebook.com" target="_blank" rel="noopener">Facebook</a>
+        <a href="https://www.instagram.com" target="_blank" rel="noopener">Instagram</a>
+      </div>
+      <div class="footer__legal">
+        <a href="#">Privacy Policy</a>
+        <a href="#">Terms &amp; Conditions</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script src="js/data.js"></script>
+<script src="js/main.js"></script>
+<script>
+  renderInto("#home-sale", productsByTag("sale"));
+  renderInto("#home-grails", productsByTag("grail"));
+  renderInto("#home-arrivals", productsByTag("new").slice(0, 8));
+  renderInto("#home-categories", []); // replaced below with custom markup
+
+  document.querySelector("#home-categories").innerHTML = CATEGORIES.map(c => `
+    <a href="category.html?slug=${c.slug}" class="cat-card">
+      <img src="${productImg(c.seed, 500, 500)}" alt="${c.name}" loading="lazy" />
+      <span>${c.name}</span>
+    </a>`).join("");
+
+  document.querySelector("#home-drops").innerHTML = DROPS.map(d => `
+    <a href="drop.html?slug=${d.slug}" class="drop-card">
+      <img src="${productImg(d.seed, 700, 900)}" alt="${d.name}" loading="lazy" />
+      <div class="drop-card__copy">
+        <h3>${d.name}</h3>
+        <p>${d.tagline}</p>
+      </div>
+    </a>`).join("");
+
+  document.querySelector("#home-social").innerHTML = TESTIMONIALS.map(t => `
+    <div class="social-card">
+      <div class="social-card__media">
+        <img src="${productImg(t.seed, 500, 625)}" alt="Customer wearing RAWLINE" loading="lazy" />
+        <span class="social-card__platform">${t.platform}</span>
+      </div>
+      <p class="social-card__quote">"${t.quote}"</p>
+      <span class="social-card__handle">${t.handle}</span>
+    </div>`).join("");
+
+  document.querySelector("#home-stores").innerHTML = STORES.map(s => `
+    <a href="#" class="store-card">
+      <img src="${productImg(s.seed, 800, 500)}" alt="${s.city} store" loading="lazy" />
+      <div class="store-card__copy">
+        <h3>${s.city}</h3>
+        <p>${s.area} — ${s.hours}</p>
+      </div>
+    </a>`).join("");
+
+  // Men/Women tab toggle (cosmetic split of the "new" tag)
+  const arrivalsEl = document.querySelector("#home-arrivals");
+  document.querySelectorAll("[data-tab]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      document.querySelectorAll("[data-tab]").forEach(b => b.classList.remove("is-active"));
+      btn.classList.add("is-active");
+      const list = productsByTag("new");
+      const half = Math.ceil(list.length / 2);
+      renderInto("#home-arrivals", btn.dataset.tab === "men" ? list.slice(0, half) : list.slice(half));
+    });
+  });
+</script>
+</body>
+</html>

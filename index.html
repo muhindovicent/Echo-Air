@@ -1,0 +1,1586 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echo & Air</title>
+    <meta name="description" content="Echo & Air | Unfiltered, high-contrast streetwear. Shop premium collections and exclusive drops for those who make a statement.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400;1,700&family=Source+Serif+4:ital,wght@0,500;0,700;0,900;1,500;1,700;1,900&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --bg-cream: rgb(255, 255, 227);
+            --accent-red: rgb(234, 48, 31);
+            --dark-bg: rgb(17, 17, 17);
+            --gray-text: rgb(120, 120, 120);
+            --card-border: rgb(71, 71, 71);
+            --text-cream: rgb(255, 255, 227);
+            --font-mono: 'Azeret Mono', monospace;
+            --font-serif: 'Source Serif 4', serif;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--font-mono);
+            background-color: var(--bg-cream);
+            color: var(--dark-bg);
+            overflow-x: hidden;
+        }
+
+        a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        img {
+            max-width: 100%;
+            display: block;
+        }
+
+        /* ==================== NAVIGATION ==================== */
+        .navbar {
+            position: fixed;
+            top: 16px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+            background: rgba(255, 255, 227, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 227, 0.2);
+            border-radius: 50px;
+            padding: 12px 28px;
+            display: flex;
+            align-items: center;
+            gap: 32px;
+            width: auto;
+            max-width: 90%;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-weight: 700;
+            font-size: 14px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .nav-logo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-red);
+        }
+
+        .nav-links .sale {
+            color: var(--accent-red);
+        }
+
+        .nav-links .new-badge {
+            position: relative;
+        }
+
+        .nav-links .new-badge::after {
+            content: '';
+            width: 5px;
+            height: 5px;
+            background: var(--accent-red);
+            border-radius: 50%;
+            position: absolute;
+            top: -2px;
+            right: -8px;
+        }
+
+        .nav-icons {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .nav-icons svg {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .nav-icons svg:hover {
+            color: var(--accent-red);
+        }
+
+        .mobile-menu-btn {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+
+        .mobile-menu-btn svg {
+            width: 22px;
+            height: 22px;
+        }
+
+        /* ==================== HERO SECTION ==================== */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1920&q=80') center/cover no-repeat;
+        }
+
+        .hero-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(17, 17, 17, 0.45);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .hero-subtitle {
+            font-family: var(--font-serif);
+            font-style: italic;
+            font-size: 20px;
+            color: var(--text-cream);
+            font-weight: 500;
+        }
+
+        .hero-title {
+            font-size: clamp(42px, 8vw, 90px);
+            font-weight: 700;
+            color: var(--text-cream);
+            line-height: 1;
+            text-transform: uppercase;
+            letter-spacing: -1px;
+        }
+
+        .hero-title span {
+            color: var(--accent-red);
+        }
+
+        .btn-primary {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent-red);
+            color: var(--text-cream);
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn-primary:hover {
+            transform: scale(1.03);
+            opacity: 0.9;
+        }
+
+        .btn-primary svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn-outline {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: transparent;
+            color: var(--text-cream);
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 2px solid var(--text-cream);
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+
+        .btn-outline:hover {
+            background: var(--text-cream);
+            color: var(--dark-bg);
+        }
+
+        .btn-outline svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .btn-outline-red {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--accent-red);
+            color: var(--text-cream);
+            padding: 14px 32px;
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            font-size: 13px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .btn-outline-red:hover {
+            transform: scale(1.03);
+            opacity: 0.9;
+        }
+
+        .btn-outline-red svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        /* Ticker / Marquee */
+        .ticker {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 2;
+            overflow: hidden;
+            height: 120px;
+            mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+            -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+        }
+
+        .ticker-track {
+            display: flex;
+            gap: 16px;
+            animation: tickerScroll 20s linear infinite;
+        }
+
+        .ticker-item {
+            flex-shrink: 0;
+            width: 160px;
+            height: 100px;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+
+        .ticker-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        @keyframes tickerScroll {
+            0% { transform: translateX(0); }
+            100% { transform: translateX(-50%); }
+        }
+
+        /* ==================== ABOUT SECTION ==================== */
+        .about {
+            position: relative;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .about-image-wrapper {
+            position: absolute;
+            inset: 0;
+            overflow: clip;
+            z-index: 0;
+        }
+
+        .about-bg {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            background: url('https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=1920&q=80') center/cover no-repeat;
+            will-change: transform;
+            transform-origin: center center;
+            animation: aboutZoom linear both;
+            animation-timeline: view();
+            animation-range: entry 0% entry 100%;
+        }
+
+        @keyframes aboutZoom {
+            0% {
+                transform: scale(1.25);
+                filter: blur(4px) brightness(0.7);
+            }
+            100% {
+                transform: scale(1.0);
+                filter: blur(0px) brightness(1);
+            }
+        }
+
+        .about-overlay {
+            position: absolute;
+            inset: 0;
+            background: var(--accent-red);
+            opacity: 0.25;
+            z-index: 1;
+        }
+
+        .about-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 2;
+            text-align: center;
+            width: 100%;
+            max-width: 900px;
+            padding: 0 24px;
+        }
+
+        .about-content-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            animation: aboutTextReveal cubic-bezier(0.16, 1, 0.3, 1) both;
+            animation-timeline: view();
+            animation-range: entry 10% entry 80%;
+        }
+
+        @keyframes aboutTextReveal {
+            0% {
+                transform: translateY(150px);
+                opacity: 0;
+                filter: blur(6px);
+            }
+            100% {
+                transform: translateY(0);
+                opacity: 1;
+                filter: blur(0px);
+            }
+        }
+
+        /* Fallback for browsers without animation-timeline support */
+        @supports not (animation-timeline: view()) {
+            .about-bg {
+                animation: none;
+                transform: scale(1.1);
+                filter: blur(0px) brightness(1);
+            }
+            .about-content-wrapper {
+                animation: none;
+                transform: translateY(0);
+                opacity: 1;
+                filter: blur(0px);
+            }
+        }
+
+        .about-title-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .about-title-group h4 {
+            font-size: 14px;
+            font-style: italic;
+            color: var(--text-cream);
+            font-weight: 500;
+        }
+
+        .about-title-group h2 {
+            font-size: clamp(56px, 8vw, 100px);
+            font-weight: 700;
+            color: var(--accent-red);
+            line-height: 1;
+            text-transform: lowercase;
+        }
+
+        .section-label {
+            font-size: 12px;
+            font-style: italic;
+            color: var(--text-cream);
+            margin-bottom: 4px;
+            text-transform: lowercase;
+        }
+
+        .section-heading {
+            font-size: clamp(48px, 7vw, 80px);
+            font-weight: 700;
+            color: var(--accent-red);
+            line-height: 1;
+            margin-bottom: 24px;
+            text-transform: lowercase;
+        }
+
+        .about-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-cream);
+            margin-bottom: 24px;
+            max-width: 900px;
+            text-align: center;
+            white-space: pre-wrap;
+        }
+
+        /* ==================== DROPS SECTION ==================== */
+        .drops {
+            padding: 100px 60px;
+        }
+
+        .drops-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 48px;
+        }
+
+        .drops-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        .drop-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 3px solid transparent;
+            transition: border-color 0.3s;
+            min-height: 400px;
+        }
+
+        .drop-card:hover {
+            border-color: var(--text-cream);
+        }
+
+        .drop-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+
+        .drop-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(17,17,17,0.8), transparent 60%);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .drop-card:hover::after {
+            opacity: 1;
+        }
+
+        .drop-card-info {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            right: 24px;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: all 0.3s;
+        }
+
+        .drop-card:hover .drop-card-info {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .drop-card-info h3 {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--text-cream);
+            margin-bottom: 8px;
+        }
+
+        .drop-card-info p {
+            font-size: 12px;
+            color: rgba(255,255,227,0.7);
+            line-height: 1.6;
+        }
+
+        /* ==================== PRODUCTS SECTION ==================== */
+        .products {
+            padding: 80px 60px;
+        }
+
+        .products-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 48px;
+        }
+
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
+        }
+
+        .product-card {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .product-card-img {
+            position: relative;
+            aspect-ratio: 3/4;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+            margin-bottom: 12px;
+        }
+
+        .product-card-img img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-card-img::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            box-shadow: inset 0px 0px 29px 13px rgba(57,57,57,0.33);
+            pointer-events: none;
+        }
+
+        .wishlist-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 2;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: rgba(255,255,227,0.9);
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: transform 0.2s;
+        }
+
+        .wishlist-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .wishlist-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .product-card-name {
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .product-card-price {
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--dark-bg);
+        }
+
+        .discount-badge {
+            position: absolute;
+            top: 12px;
+            left: 12px;
+            z-index: 2;
+            background: var(--accent-red);
+            color: var(--text-cream);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 700;
+        }
+
+        /* ==================== FEATURES SECTION ==================== */
+        .features {
+            padding: 100px 60px;
+            background: var(--bg-cream);
+        }
+
+        .features-header {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 24px;
+        }
+
+        .feature-card {
+            background: transparent;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 32px 24px;
+            text-align: center;
+            transition: transform 0.3s, border-color 0.3s;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-8px);
+            border-color: var(--accent-red);
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 20px;
+            background: var(--accent-red);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .feature-icon svg {
+            width: 24px;
+            height: 24px;
+            color: var(--text-cream);
+        }
+
+        .feature-card h3 {
+            font-size: 16px;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .feature-card .feature-duration {
+            font-size: 12px;
+            color: var(--accent-red);
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .feature-card p {
+            font-size: 12px;
+            line-height: 1.7;
+            color: var(--gray-text);
+        }
+
+        /* ==================== CATEGORIES SECTION ==================== */
+        .categories {
+            padding: 80px 60px;
+        }
+
+        .categories-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 48px;
+        }
+
+        .categories-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+
+        .category-card {
+            position: relative;
+            aspect-ratio: 1;
+            border-radius: 16px;
+            overflow: hidden;
+            cursor: pointer;
+            border: 2px solid transparent;
+            transition: border-color 0.3s;
+        }
+
+        .category-card:hover {
+            border-color: var(--text-cream);
+        }
+
+        .category-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s;
+        }
+
+        .category-card:hover img {
+            transform: scale(1.05);
+        }
+
+        .category-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(17,17,17,0.7), transparent 50%);
+        }
+
+        .category-card span {
+            position: absolute;
+            bottom: 16px;
+            left: 16px;
+            z-index: 2;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-cream);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ==================== GIFT CARD SECTION ==================== */
+        .gift-card {
+            position: relative;
+            padding: 120px 60px;
+            min-height: 60vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .gift-card-bg {
+            position: absolute;
+            inset: 0;
+            background: url('https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=1920&q=80') center/cover no-repeat;
+        }
+
+        .gift-card-bg::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: rgba(17, 17, 17, 0.25);
+        }
+
+        .gift-card-content {
+            position: relative;
+            z-index: 2;
+            max-width: 500px;
+        }
+
+        .gift-card-content .section-heading {
+            font-size: clamp(56px, 8vw, 100px);
+        }
+
+        .gift-card-desc {
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--text-cream);
+            margin-bottom: 32px;
+        }
+
+        /* ==================== STORES SECTION ==================== */
+        .stores {
+            padding: 100px 60px;
+        }
+
+        .stores-header {
+            margin-bottom: 48px;
+        }
+
+        .stores-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
+        }
+
+        .store-card {
+            position: relative;
+            border-radius: 16px;
+            overflow: hidden;
+            min-height: 350px;
+        }
+
+        .store-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            position: absolute;
+            inset: 0;
+        }
+
+        .store-card::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(17,17,17,0.85), rgba(17,17,17,0.2) 60%);
+        }
+
+        .store-card-info {
+            position: absolute;
+            bottom: 28px;
+            left: 28px;
+            right: 28px;
+            z-index: 2;
+        }
+
+        .store-card-info h3 {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-cream);
+            margin-bottom: 6px;
+        }
+
+        .store-card-info .store-location {
+            font-size: 13px;
+            color: var(--accent-red);
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .store-card-info .store-hours {
+            font-size: 12px;
+            color: rgba(255,255,227,0.6);
+        }
+
+        /* ==================== FOOTER ==================== */
+        .footer {
+            background: var(--dark-bg);
+            padding: 80px 60px 40px;
+            color: var(--text-cream);
+        }
+
+        .footer-top {
+            display: grid;
+            grid-template-columns: 1.5fr 1.5fr 1fr;
+            gap: 60px;
+            margin-bottom: 60px;
+        }
+
+        .footer-brand h2 {
+            font-size: 18px;
+            font-weight: 700;
+            margin-bottom: 4px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .footer-brand .brand-tagline {
+            font-size: 11px;
+            color: var(--gray-text);
+            text-transform: lowercase;
+            font-style: italic;
+            margin-bottom: 28px;
+        }
+
+        .footer-subscribe h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-bottom: 12px;
+        }
+
+        .footer-subscribe p {
+            font-size: 12px;
+            color: rgba(255,255,227,0.6);
+            line-height: 1.7;
+            margin-bottom: 16px;
+        }
+
+        .subscribe-form {
+            display: flex;
+            gap: 0;
+        }
+
+        .subscribe-form input {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--accent-red);
+            border-right: none;
+            padding: 12px 16px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            color: var(--text-cream);
+            outline: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subscribe-form input::placeholder {
+            color: var(--gray-text);
+        }
+
+        .subscribe-form button {
+            background: var(--text-cream);
+            color: var(--dark-bg);
+            border: none;
+            padding: 12px 24px;
+            font-family: var(--font-mono);
+            font-size: 11px;
+            font-weight: 700;
+            cursor: pointer;
+            border-radius: 0 8px 8px 0;
+            text-transform: uppercase;
+            transition: opacity 0.2s;
+        }
+
+        .subscribe-form button:hover {
+            opacity: 0.85;
+        }
+
+        .footer-contact h3 {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--accent-red);
+            margin-bottom: 16px;
+        }
+
+        .footer-contact p {
+            font-size: 12px;
+            color: rgba(255,255,227,0.6);
+            line-height: 1.7;
+            margin-bottom: 6px;
+        }
+
+        .footer-contact a {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: rgba(255,255,227,0.6);
+            transition: color 0.2s;
+        }
+
+        .footer-contact a:hover {
+            color: var(--text-cream);
+        }
+
+        .footer-contact a svg {
+            width: 12px;
+            height: 12px;
+        }
+
+        .footer-links {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 40px;
+        }
+
+        .footer-links a {
+            display: inline-block;
+            padding: 10px 20px;
+            border: 1px solid var(--card-border);
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: border-color 0.2s, color 0.2s;
+        }
+
+        .footer-links a:hover {
+            border-color: var(--text-cream);
+            color: var(--text-cream);
+        }
+
+        .footer-socials {
+            display: flex;
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .footer-socials a {
+            font-size: 13px;
+            font-weight: 500;
+            text-transform: uppercase;
+            position: relative;
+            transition: color 0.2s;
+        }
+
+        .footer-socials a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--text-cream);
+            transition: width 0.2s;
+        }
+
+        .footer-socials a:hover {
+            color: var(--text-cream);
+        }
+
+        .footer-socials a:hover::after {
+            width: 100%;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 24px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            font-size: 11px;
+            color: var(--gray-text);
+        }
+
+        .footer-bottom a {
+            color: var(--gray-text);
+            transition: color 0.2s;
+        }
+
+        .footer-bottom a:hover {
+            color: var(--text-cream);
+        }
+
+        .footer-bottom-links {
+            display: flex;
+            gap: 20px;
+        }
+
+        /* ==================== RESPONSIVE ==================== */
+        @media (max-width: 1100px) {
+            .products-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .features-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .categories-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 810px) {
+            .navbar {
+                padding: 10px 20px;
+                gap: 16px;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .drops-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .drops-grid .drop-card:first-child {
+                grid-column: auto;
+            }
+
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .categories-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .stores-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-top {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .gift-card,
+            .drops,
+            .products,
+            .features,
+            .categories,
+            .stores,
+            .footer {
+                padding-left: 24px;
+                padding-right: 24px;
+            }
+
+            .footer-bottom {
+                flex-direction: column;
+                gap: 12px;
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .products-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .categories-grid {
+                grid-template-columns: 1fr 1fr;
+                gap: 12px;
+            }
+        }
+
+        /* ==================== SCROLL ANIMATIONS ==================== */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVIGATION -->
+    <nav class="navbar">
+        <a href="#" class="nav-logo">
+            <svg viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <rect x="2" y="2" width="24" height="24" rx="4" fill="var(--accent-red)"/>
+                <path d="M8 20V8h4l4 6 4-6h4v12h-3.5v-7.5L16 16.5l-3-4v7.5H8z" fill="var(--text-cream)"/>
+            </svg>
+            Echo & Air
+        </a>
+        <ul class="nav-links">
+            <li><a href="#">Shop <svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 4.5L6 7.5L9 4.5"/></svg></a></li>
+            <li><a href="#">Drops <svg viewBox="0 0 12 12" fill="var(--accent-red)"><polygon points="6,0 7.5,4 12,4.5 8.5,7.5 9.5,12 6,9.5 2.5,12 3.5,7.5 0,4.5 4.5,4"/></svg></a></li>
+            <li><a href="#" class="sale">Sale</a></li>
+            <li><a href="#" class="new-badge">New</a></li>
+        </ul>
+        <div class="nav-icons">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 002 2h14a2 2 0 002-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 01-8 0"/></svg>
+        </div>
+        <button class="mobile-menu-btn">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+    </nav>
+
+    <!-- HERO SECTION -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <p class="hero-subtitle">Dress the unconventional</p>
+            <h1 class="hero-title">WEAR THE HYPE <span>"EA"</span></h1>
+            <a href="#" class="btn-primary">
+                Shop Now
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+        </div>
+        <div class="ticker">
+            <div class="ticker-track">
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1622445275576-721325763afe?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300&q=80" alt="Product"></div>
+                <!-- Duplicate for seamless loop -->
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1622445275576-721325763afe?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1556906781-9a412961c28c?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=300&q=80" alt="Product"></div>
+                <div class="ticker-item"><img src="https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=300&q=80" alt="Product"></div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ABOUT SECTION -->
+    <section class="about" id="about" data-framer-name="About Us" data-framer-hydrated-v2>
+        <div class="about-image-wrapper" data-framer-name="Image Container" data-framer-hydrated-v2>
+            <div class="about-bg" data-framer-name="Background Image" data-framer-hydrated-v2 data-framer-appear-id="about-zoom"></div>
+        </div>
+        <div class="about-overlay" data-framer-name="Overlay" data-framer-hydrated-v2></div>
+        <div class="about-content">
+            <div class="about-content-wrapper" data-framer-name="Info" data-framer-hydrated-v2 data-framer-appear-id="about-text">
+                <div class="about-title-group" data-framer-name="Title" data-framer-hydrated-v2>
+                    <h4>us</h4>
+                    <h2>About</h2>
+                </div>
+                <p class="about-desc" data-framer-name="Description" data-framer-hydrated-v2>Echo & Air is more than clothing, it's a movement. Born from the streets,
+                     driven by culture, and made for trendsetters. Bold drops, exclusive collabs,
+                      and fearless energy define those who stay fresh.</p>
+                <a href="./about" data-framer-name="Button" data-framer-hydrated-v2 class="btn-outline">View More
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- DROPS SECTION -->
+    <section class="drops">
+        <div class="drops-header fade-in">
+            <div>
+                <p class="section-label">latest</p>
+                <h2 class="section-heading" style="margin-bottom: 0;">Drops</h2>
+            </div>
+            <a href="#" class="btn-outline-red">View All
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+        </div>
+        <div class="drops-grid">
+            <div class="drop-card fade-in">
+                <img src="https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=900&q=80" alt="Echo & Air x Nova">
+                <div class="drop-card-info">
+                    <h3>Echo & Air x NOVA</h3>
+                    <p>Minimal form meets future fabric. A collaboration that redefines clean silhouettes with tech-forward materials.</p>
+                </div>
+            </div>
+            <div class="drop-card fade-in">
+                <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=600&q=80" alt="Echo & Air x Vero">
+                <div class="drop-card-info">
+                    <h3>Echo & Air x VERO</h3>
+                    <p>Where vintage meets vision. Earthy tones, bold cuts.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- PRODUCTS SECTION -->
+    <section class="products">
+        <div class="products-header fade-in">
+            <div>
+                <p class="section-label">shop our</p>
+                <h2 class="section-heading" style="margin-bottom: 0;">Products</h2>
+            </div>
+        </div>
+        <div class="products-grid">
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500&q=80" alt="Horizon Blue Long Sleeve">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Horizon Blue Long Sleeve Cotton Classic</p>
+                <p class="product-card-price">$89.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1586350977771-b3b0abd50c82?w=500&q=80" alt="Sky Socks">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Sky Socks</p>
+                <p class="product-card-price">$24.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1434389677669-e08b4cda3a3e?w=500&q=80" alt="Eclipse Knit Cardigan">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                    <span class="discount-badge">-20%</span>
+                </div>
+                <p class="product-card-name">Eclipse Knit Cardigan</p>
+                <p class="product-card-price">$142.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80" alt="Cavalry Shirt">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Cavalry Shirt</p>
+                <p class="product-card-price">$110.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80" alt="Stratos 95 SP">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Stratos 95 SP - Diffused Taupe Layers Edition</p>
+                <p class="product-card-price">$189.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&q=80" alt="Dark Blue Jeans">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Dark Blue Earthy Fade Jeans</p>
+                <p class="product-card-price">$130.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1602810318383-e386cc2a3ccf?w=500&q=80" alt="Red Checkered Shirt">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Red Checkered Shirt</p>
+                <p class="product-card-price">$95.00</p>
+            </div>
+            <div class="product-card fade-in">
+                <div class="product-card-img">
+                    <img src="https://images.unsplash.com/photo-1618354691373-d851c5c3a990?w=500&q=80" alt="Classic Crew Neck">
+                    <button class="wishlist-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></button>
+                </div>
+                <p class="product-card-name">Classic Crew Neck</p>
+                <p class="product-card-price">$65.00</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- FEATURES SECTION -->
+    <section class="features">
+        <div class="features-header fade-in">
+            <p class="section-label">why</p>
+            <h2 class="section-heading">Echo & Air?</h2>
+        </div>
+        <div class="features-grid">
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8l4-3v14l-4-3"/></svg>
+                </div>
+                <h3>Fast Shipping</h3>
+                <p class="feature-duration">3-5 business days</p>
+                <p>Get your order delivered quickly, straight to your door.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 109 9"/><polyline points="12 8 12 12 15 15"/></svg>
+                </div>
+                <h3>Easy Returns</h3>
+                <p class="feature-duration">7 days from delivery</p>
+                <p>Return your items hassle-free within 7 days of receiving them.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                </div>
+                <h3>Secure Payments</h3>
+                <p class="feature-duration">Bank-grade SSL protection</p>
+                <p>Pay for your order with confidence using our secure checkout.</p>
+            </div>
+            <div class="feature-card fade-in">
+                <div class="feature-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+                </div>
+                <h3>Customer Support</h3>
+                <p class="feature-duration">24/7 assistance</p>
+                <p>Get the help you need, fast. Our team is always here for you.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- CATEGORIES SECTION -->
+    <section class="categories">
+        <div class="categories-header fade-in">
+            <div>
+                <p class="section-label">shop by</p>
+                <h2 class="section-heading" style="margin-bottom: 0;">Categories</h2>
+            </div>
+            <a href="#" class="btn-outline-red">Shop All
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+        </div>
+        <div class="categories-grid">
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&q=80" alt="Shoes">
+                <span>Shoes</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=500&q=80" alt="T-Shirt">
+                <span>T-Shirt</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&q=80" alt="Hoodie">
+                <span>Hoodie</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=500&q=80" alt="Jacket">
+                <span>Jacket</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500&q=80" alt="Shirt">
+                <span>Shirt</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=500&q=80" alt="Jeans">
+                <span>Jeans</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&q=80" alt="Accessories">
+                <span>Accessories</span>
+            </a>
+            <a href="#" class="category-card fade-in">
+                <img src="https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=500&q=80" alt="Grails">
+                <span>Grails</span>
+            </a>
+        </div>
+    </section>
+
+    <!-- GIFT CARD SECTION -->
+    <section class="gift-card">
+        <div class="gift-card-bg"></div>
+        <div class="gift-card-content fade-in">
+            <p class="section-label" style="color: var(--text-cream);">gift card</p>
+            <h2 class="section-heading">Echo & Air</h2>
+            <p class="gift-card-desc">Not sure what to grab? Keep it real with the Echo & Air Gift Card. Let them choose their own pieces and wear what speaks to them.</p>
+            <a href="#" class="btn-outline">Get Now
+                <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+            </a>
+        </div>
+    </section>
+
+    <!-- STORES SECTION -->
+    <section class="stores">
+        <div class="stores-header fade-in">
+            <p class="section-label">walk-in</p>
+            <h2 class="section-heading">Stores</h2>
+        </div>
+        <div class="stores-grid">
+            <a href="#" class="store-card fade-in">
+                <img src="https://images.unsplash.com/photo-1555529669-e69e7aa0ba9a?w=800&q=80" alt="London Store">
+                <div class="store-card-info">
+                    <h3>London</h3>
+                    <p class="store-location">Canary Wharf</p>
+                    <p class="store-hours">Mon - Sun, 10am - 6pm</p>
+                </div>
+            </a>
+            <a href="#" class="store-card fade-in">
+                <img src="https://images.unsplash.com/photo-1604719312566-8912e9227c6a?w=800&q=80" alt="New York Store">
+                <div class="store-card-info">
+                    <h3>New York City</h3>
+                    <p class="store-location">Manhattan</p>
+                    <p class="store-hours">Mon - Sun, 10am - 6pm</p>
+                </div>
+            </a>
+        </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-top">
+            <div class="footer-brand">
+                <h2>Echo & Air</h2>
+                <p class="brand-tagline">clothing store</p>
+                <div class="footer-subscribe">
+                    <h3>Stay in the loop</h3>
+                    <p>Join to receive exclusive offers and 15% off your first order.</p>
+                    <form class="subscribe-form" onsubmit="return false;">
+                        <input type="email" placeholder="Email Address">
+                        <button type="submit">Send</button>
+                    </form>
+                </div>
+            </div>
+            <div class="footer-contact">
+                <h3>Contact Us</h3>
+                <p>EA Studio, 12 Forge Lane<br>Riverton, Fictionland 00000</p>
+                <a href="mailto:hello@echoandair.example">
+                    hello@echoandair.example
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+                </a>
+                <a href="tel:+15550102025">
+                    +1 (555) 010-2025
+                    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 8h10M9 4l4 4-4 4"/></svg>
+                </a>
+            </div>
+            <div></div>
+        </div>
+
+        <div class="footer-links">
+            <a href="#">All</a>
+            <a href="#">Drops</a>
+            <a href="#">New</a>
+            <a href="#">Sale</a>
+            <a href="#">About</a>
+        </div>
+
+        <div class="footer-socials">
+            <a href="#">X</a>
+            <a href="#">Facebook</a>
+            <a href="#">Instagram</a>
+            <a href="#">TikTok</a>
+            <a href="#">X</a>
+            <a href="#">LinkedIn</a>
+        </div>
+
+        <div class="footer-bottom">
+            <p>&copy; 2026 Echo & Air</p>
+            <div class="footer-bottom-links">
+                <a href="#">Privacy Policy</a>
+                <a href="#">Terms & Conditions</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- SCROLL ANIMATION SCRIPT -->
+    <script>
+        // General fade-in observer
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+
+        // Mark Framer-hydrated elements as initialized
+        document.querySelectorAll('[data-framer-hydrated-v2]').forEach(el => {
+            el.setAttribute('data-framer-hydrated-v2', 'true');
+        });
+    </script>
+
+</body>
+</html>
