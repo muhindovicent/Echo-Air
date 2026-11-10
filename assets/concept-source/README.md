@@ -14,8 +14,8 @@ exclude those marks before they are published to `public/concept/`.
 | `campaign.jpg`  | `images.unsplash.com/photo-1529139574466-a303027c1d8b` | Graphic tee print |
 | `denim.jpg`     | `images.unsplash.com/photo-1542272604-787c3835535d`   | Visible brand patches |
 | `jacket.jpg`    | `images.unsplash.com/photo-1551028719-00167b16eac5`   | Visible retailer label |
-| `jersey.jpg`    | `images.unsplash.com/photo-1618354691373-d851c5c3a990` | Print on chest    |
-| `look-01.jpg`   | `images.unsplash.com/photo-1583743814966-8936f5b7be1a` | Print on chest    |
+| `jersey.jpg`    | `images.unsplash.com/photo-1618354691373-d851c5c3a990` | Chest print       |
+| `look-01.jpg`   | `images.unsplash.com/photo-1583743814966-8936f5b7be1a` | Chest print       |
 | `look-02.jpg`   | `images.unsplash.com/photo-1509631179647-0177331693ae` | Editorial frame    |
 | `look-04.jpg`   | `images.unsplash.com/photo-1515886657613-9f3515b0c78f` | Full-length frame  |
 | `runner.jpg`    | `images.unsplash.com/photo-1542291026-7eec264c27ff`   | Visible brand mark |

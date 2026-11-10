@@ -76,7 +76,7 @@ export function SiteFooter() {
             &copy; {copyrightYear} Echo &amp; Air — Phase 01 foundation
           </p>
           <Link
-            href="#top"
+            href="/#top"
             className="label group inline-flex items-center gap-3 text-bone transition-colors duration-300 hover:text-acid"
           >
             <span

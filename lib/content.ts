@@ -39,10 +39,15 @@ export type NavItem = {
   href: string;
 };
 
+/**
+ * Primary navigation. Homepage sections are addressed with absolute paths so
+ * the same links resolve correctly from the catalogue and product pages.
+ */
 export const navItems: NavItem[] = [
-  { label: "New Arrivals", href: "#new-arrivals" },
-  { label: "Lookbook", href: "#lookbook" },
-  { label: "Studio", href: "#studio" },
+  { label: "Shop", href: "/shop" },
+  { label: "New Arrivals", href: "/#new-arrivals" },
+  { label: "Lookbook", href: "/#lookbook" },
+  { label: "Studio", href: "/#studio" },
 ];
 
 /**
@@ -211,9 +216,10 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
   {
     title: "Navigate",
     links: [
-      { label: "New Arrivals", href: "#new-arrivals" },
-      { label: "Lookbook", href: "#lookbook" },
-      { label: "Studio", href: "#studio" },
+      { label: "Shop", href: "/shop" },
+      { label: "New Arrivals", href: "/#new-arrivals" },
+      { label: "Lookbook", href: "/#lookbook" },
+      { label: "Studio", href: "/#studio" },
     ],
   },
 ];

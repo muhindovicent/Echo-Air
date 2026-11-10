@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import type { CSSProperties } from "react";
 import { ConceptFigure } from "@/components/ui/ConceptFigure";
 import { Reveal } from "@/components/ui/Reveal";
@@ -105,6 +106,19 @@ export function NewArrivals() {
               Sizing, stock and pricing arrive with the commerce phase. This is
               a preview list — nothing here can be ordered yet.
             </p>
+
+            <Link
+              href="/shop"
+              className="label group mt-6 inline-flex items-center gap-3 text-bone transition-colors duration-300 hover:text-acid"
+            >
+              Open the full catalogue
+              <span
+                aria-hidden="true"
+                className="transition-transform duration-300 group-hover:translate-x-1"
+              >
+                &rarr;
+              </span>
+            </Link>
           </Reveal>
         </div>
       </div>

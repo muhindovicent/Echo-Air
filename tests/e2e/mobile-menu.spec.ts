@@ -56,6 +56,21 @@ test.describe("mobile menu", () => {
     expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
   });
 
+  test("returns focus to the toggle after the panel is closed", async ({
+    page,
+  }) => {
+    const toggle = toggleButton(page);
+
+    await toggle.click();
+    const dialog = page.getByRole("dialog", { name: "Site navigation" });
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator(":focus")).toHaveCount(1);
+
+    await page.keyboard.press("Escape");
+    await expect(dialog).toHaveCount(0);
+    await expect(toggle).toBeFocused();
+  });
+
   test("keeps tab focus inside the panel", async ({ page }) => {
     await toggleButton(page).click();
     const dialog = page.getByRole("dialog", { name: "Site navigation" });
