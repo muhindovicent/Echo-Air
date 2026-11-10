@@ -23,10 +23,10 @@ export function ClosingBand() {
             </p>
             <div className="flex flex-wrap items-center gap-4 md:col-span-5 md:col-start-8 md:justify-end">
               <Link
-                href="#new-arrivals"
+                href="/shop"
                 className="label group inline-flex items-center gap-3 border border-obsidian bg-obsidian px-6 py-4 text-bone transition-colors duration-300 hover:bg-transparent hover:text-obsidian"
               >
-                Back to the drop
+                Browse the catalogue
                 <span
                   aria-hidden="true"
                   className="transition-transform duration-300 group-hover:translate-x-1"
@@ -35,10 +35,10 @@ export function ClosingBand() {
                 </span>
               </Link>
               <Link
-                href="#studio"
+                href="/shop?category=outerwear"
                 className="label inline-flex items-center gap-3 border border-obsidian/30 px-6 py-4 transition-colors duration-300 hover:border-obsidian"
               >
-                Read the studio notes
+                Outerwear only
               </Link>
             </div>
           </div>

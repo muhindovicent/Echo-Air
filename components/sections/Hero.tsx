@@ -56,7 +56,7 @@ export function Hero() {
           </p>
 
           <div className="flex flex-wrap items-center gap-4 md:col-span-6 md:col-start-7 md:justify-end">
-            <ActionLink href="#new-arrivals">Enter the drop</ActionLink>
+            <ActionLink href="/shop">Shop the drop</ActionLink>
             <ActionLink href="#lookbook" variant="ghost">
               View lookbook
             </ActionLink>

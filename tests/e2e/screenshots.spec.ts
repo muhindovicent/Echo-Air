@@ -62,4 +62,50 @@ test.describe("review screenshots", () => {
       quality: 78,
     });
   });
+
+  for (const shot of [
+    { name: "shop-desktop-1440", width: 1440, height: 900 },
+    { name: "shop-mobile-375", width: 375, height: 812 },
+  ]) {
+    test(`captures ${shot.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: shot.width, height: shot.height });
+      await page.goto("/shop");
+      await settle(page);
+
+      await page.screenshot({
+        path: path.join(OUT, `${shot.name}.jpg`),
+        fullPage: true,
+        type: "jpeg",
+        quality: 78,
+      });
+
+      await page.screenshot({
+        path: path.join(OUT, `${shot.name}-fold.jpg`),
+        type: "jpeg",
+        quality: 78,
+      });
+
+      await expect(page.getByTestId("product-grid")).toBeVisible();
+    });
+  }
+
+  for (const shot of [
+    { name: "product-desktop-1440", width: 1440, height: 900 },
+    { name: "product-mobile-375", width: 375, height: 812 },
+  ]) {
+    test(`captures ${shot.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: shot.width, height: shot.height });
+      await page.goto("/shop/longform-overcoat");
+      await settle(page);
+
+      await page.screenshot({
+        path: path.join(OUT, `${shot.name}.jpg`),
+        fullPage: true,
+        type: "jpeg",
+        quality: 78,
+      });
+
+      await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
+    });
+  }
 });

@@ -9,21 +9,24 @@ Regenerate these crops from `assets/concept-source/` with:
 python tools/crop_concept_assets.py
 ```
 
-| File                   | Source frame                    | Crop                        |
-| ---------------------- | ------------------------------- | --------------------------- |
-| `hero.jpg`             | `look-04.jpg` (full length)     | full frame                  |
-| `featured.jpg`         | `look-02.jpg` (editorial)       | 4–96% wide, top 92%         |
-| `studio.jpg`           | `tee.jpg`                       | torso crop                  |
-| `look-01.jpg`          | `campaign.jpg`                  | eyewear detail              |
-| `look-02.jpg`          | `sweatshirt.jpg`                | trouser leg + ledge         |
-| `look-03.jpg`          | `denim.jpg`                     | dark denim only             |
-| `look-04.jpg`          | `jacket.jpg`                    | leather folds               |
-| `piece-sleeve.jpg`     | `look-01.jpg`                   | full frame                  |
-| `piece-outerwear.jpg`  | `jacket.jpg`                    | full frame                  |
-| `piece-bomber.jpg`     | `campaign.jpg`                  | full frame                  |
-| `piece-runner.jpg`     | `runner.jpg`                    | toe + sole                  |
-| `piece-denim.jpg`      | `denim.jpg`                     | full frame                  |
-| `piece-jersey.jpg`     | `jersey.jpg`                    | full frame                  |
+| File                   | Source frame                    | Crop                             |
+| ---------------------- | ------------------------------- | -------------------------------- |
+| `hero.jpg`             | `look-04.jpg` (full length)     | full frame                       |
+| `featured.jpg`         | `look-02.jpg` (editorial)       | 4–96% wide, top 92%              |
+| `studio.jpg`           | `tee.jpg`                       | torso crop                       |
+| `look-01.jpg`          | `campaign.jpg`                  | eyewear detail                   |
+| `piece-bomber.jpg`     | `campaign.jpg`                  | jacket body, chest print cropped |
+| `look-02.jpg`          | `sweatshirt.jpg`                | trouser leg + ledge              |
+| `look-03.jpg`          | `denim.jpg`                     | black denim, no patches          |
+| `piece-denim.jpg`      | `denim.jpg`                     | light indigo denim               |
+| `look-04.jpg`          | `jacket.jpg`                    | leather folds                    |
+| `piece-outerwear.jpg`  | `jacket.jpg`                    | leather + zip, label cropped out |
+| `piece-runner.jpg`     | `runner.jpg`                    | toe + sole, logo cropped out     |
+| `piece-sleeve.jpg`     | `look-01.jpg`                   | plain body, chest print cropped  |
+| `piece-jersey.jpg`     | `jersey.jpg`                    | plain body, chest badge cropped  |
+
+The crops deliberately exclude the third-party marks that appear in the raw
+legacy stock (retailer labels, competitor logos and chest prints).
 
 Replace with real campaign photography in a later phase and remove the
 monochrome + acid duotone grade in `components/ui/ConceptFigure.tsx`.

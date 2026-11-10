@@ -66,9 +66,24 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
 | `Lookbook`           | `components/sections/Lookbook.tsx` | Asymmetric collage                           |
 | `BrandStory`         | `components/sections/BrandStory.tsx` | Studio statement + principles            |
 | `ClosingBand`        | `components/sections/ClosingBand.tsx` | Acid-green statement band                |
+| `ShopBrowser`        | `components/shop/ShopBrowser.tsx`  | Search, filter, sort, indicators, empty state |
+| `ProductCard`        | `components/shop/ProductCard.tsx`  | Fixed-ratio card, single link target        |
+| `CategoryFilterList` | `components/shop/CategoryFilterList.tsx` | Toggle buttons with `aria-pressed`   |
+| `SortControl`        | `components/shop/SortControl.tsx`  | Native select, dark and light tones         |
+| `FilterPanel`        | `components/shop/FilterPanel.tsx`  | Mobile filter dialog                         |
 | `ActionLink`         | `components/ui/ActionLink.tsx`     | Solid / ghost / quiet link variants          |
 | `ConceptFigure`      | `components/ui/ConceptFigure.tsx`  | Fixed-ratio frame, concept tag, duotone grade |
 | `Reveal`             | `components/ui/Reveal.tsx`         | Intersection-observer scroll reveal          |
+| `useModalDialog`     | `components/ui/useModalDialog.ts`  | Shared dialog contract (focus trap, Escape)  |
+
+### Catalogue rules
+
+- The catalogue model (`lib/products.ts`) has no commercial fields. `isConcept`
+  is typed as the literal `true` and `availability` as `"not-for-sale"`, so a
+  price or stock field cannot be added without changing the type.
+- Every card links to a real preview route; there are no placeholder hrefs.
+- Filtering lives in the browser so `/shop` stays statically prerendered, and
+  the active state is mirrored into the query string for shareable views.
 
 ## 6. Imagery rules
 

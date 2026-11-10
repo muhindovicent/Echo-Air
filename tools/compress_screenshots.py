@@ -17,6 +17,10 @@ MAX_WIDTH = {
     "home-desktop-1440.jpg": 1080,
     "home-tablet-768.jpg": 720,
     "home-mobile-375.jpg": 375,
+    "shop-desktop-1440.jpg": 1080,
+    "shop-mobile-375.jpg": 375,
+    "product-desktop-1440.jpg": 1080,
+    "product-mobile-375.jpg": 375,
 }
 QUALITY = 72
 

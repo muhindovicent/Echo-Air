@@ -77,9 +77,10 @@ test.describe("homepage rendering", () => {
       expect(link.href).not.toBe("#");
       expect(link.href).not.toMatch(/^#\s*$/);
 
-      if (link.href.startsWith("#")) {
-        const id = link.href.slice(1);
-        await expect(page.locator(`#${id}`)).toHaveCount(1);
+      const hash = link.href.includes("#") ? link.href.split("#")[1] : "";
+      if (hash) {
+        // Both "/#section" and "#section" must resolve to a real element.
+        await expect(page.locator(`#${hash}`)).toHaveCount(1);
       }
 
       if (link.target === "_blank") {
@@ -92,7 +93,7 @@ test.describe("homepage rendering", () => {
     await page.goto("/");
 
     for (const id of ["new-arrivals", "lookbook", "studio"]) {
-      const desktopLink = page.locator(`header a[href="#${id}"]`).first();
+      const desktopLink = page.locator(`header a[href="/#${id}"]`).first();
 
       if (await desktopLink.isVisible()) {
         await desktopLink.click();
@@ -101,11 +102,32 @@ test.describe("homepage rendering", () => {
         const toggle = page.locator('button[aria-controls="mobile-navigation"]');
         await toggle.click();
         const dialog = page.getByRole("dialog", { name: "Site navigation" });
-        await dialog.locator(`a[href="#${id}"]`).click();
+        await dialog.locator(`a[href="/#${id}"]`).click();
       }
 
       const target = page.locator(`#${id}`);
       await expect(target).toBeInViewport({ timeout: 10_000 });
     }
+  });
+
+  test("reaches the catalogue from the homepage", async ({ page }) => {
+    await page.goto("/");
+
+    const shopLink = page.locator('header a[href="/shop"]').first();
+    if (await shopLink.isVisible()) {
+      await shopLink.click();
+    } else {
+      const toggle = page.locator('button[aria-controls="mobile-navigation"]');
+      await toggle.click();
+      await page
+        .getByRole("dialog", { name: "Site navigation" })
+        .locator('a[href="/shop"]')
+        .click();
+    }
+
+    await expect(page).toHaveURL(/\/shop$/);
+    await expect(
+      page.getByRole("heading", { name: "The catalogue", level: 1 }),
+    ).toBeVisible();
   });
 });

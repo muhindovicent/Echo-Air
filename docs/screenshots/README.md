@@ -12,6 +12,12 @@ so reviewers can see the result without running the site.
 | `home-mobile-375-fold.jpg` | Mobile 375×812, first viewport |
 | `home-mobile-375.jpg` | Mobile 375×812, full page |
 | `mobile-menu-375.jpg` | Mobile navigation panel open |
+| `shop-desktop-1440-fold.jpg` | Catalogue 1440×900, first viewport |
+| `shop-desktop-1440.jpg` | Catalogue 1440×900, full page |
+| `shop-mobile-375-fold.jpg` | Catalogue 375×812, first viewport |
+| `shop-mobile-375.jpg` | Catalogue 375×812, full page |
+| `product-desktop-1440.jpg` | Product preview 1440×900, full page |
+| `product-mobile-375.jpg` | Product preview 375×812, full page |
 
 Regenerate:
 

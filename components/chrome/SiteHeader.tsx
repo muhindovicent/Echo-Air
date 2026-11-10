@@ -2,11 +2,9 @@
 
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useModalDialog } from "@/components/ui/useModalDialog";
 import { cn } from "@/lib/cn";
 import { navItems } from "@/lib/content";
-
-const FOCUSABLE =
-  'a[href], button:not([disabled]), input, [tabindex]:not([tabindex="-1"])';
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
@@ -23,54 +21,7 @@ export function SiteHeader() {
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
-  useEffect(() => {
-    if (!menuOpen) return;
-
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const { body } = document;
-    const previousOverflow = body.style.overflow;
-    body.style.overflow = "hidden";
-
-    const panel = panelRef.current;
-    const firstFocusable = panel?.querySelector<HTMLElement>(FOCUSABLE);
-    firstFocusable?.focus();
-
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        event.preventDefault();
-        closeMenu();
-        toggleRef.current?.focus();
-        return;
-      }
-
-      if (event.key !== "Tab" || !panel) return;
-
-      const focusable = Array.from(
-        panel.querySelectorAll<HTMLElement>(FOCUSABLE),
-      ).filter((element) => element.offsetParent !== null);
-
-      if (focusable.length === 0) return;
-
-      const first = focusable[0];
-      const last = focusable[focusable.length - 1];
-
-      if (event.shiftKey && document.activeElement === first) {
-        event.preventDefault();
-        last.focus();
-      } else if (!event.shiftKey && document.activeElement === last) {
-        event.preventDefault();
-        first.focus();
-      }
-    };
-
-    document.addEventListener("keydown", onKeyDown);
-
-    return () => {
-      document.removeEventListener("keydown", onKeyDown);
-      body.style.overflow = previousOverflow;
-      previouslyFocused?.focus?.();
-    };
-  }, [menuOpen, closeMenu]);
+  useModalDialog(menuOpen, closeMenu, panelRef);
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">
@@ -91,7 +42,7 @@ export function SiteHeader() {
       >
         <div className="mx-auto flex max-w-[1600px] items-center justify-between gap-6 px-5 py-4 md:px-10">
           <Link
-            href="#top"
+            href="/#top"
             className="group flex items-center gap-3"
             aria-label="Echo & Air — back to top"
           >

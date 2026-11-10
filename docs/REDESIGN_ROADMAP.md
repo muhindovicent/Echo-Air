@@ -90,12 +90,34 @@ green lint/typecheck/production build.
 
 ## Phase 3 — catalog and product discovery
 
-- Introduce typed products, variants, images, sizes, availability, and collections.
-- Implement home, shop, collections, product detail, drops and about pages.
-- Add category navigation, real product links, filters/sort where inventory warrants.
-- Keep placeholder/mock product data explicitly labeled as demo data.
+**Delivered in `feat/phase-02-product-catalog`** (demonstration catalogue):
 
-**Exit criteria:** a visitor can reach a product from the homepage and inspect its actual purchasing details without broken links.
+- [x] Introduce a strongly typed product model (`lib/products.ts`) with
+      working titles, categories, concept construction notes and concept
+      imagery — deliberately with no price, stock, size, review or purchase
+      field.
+- [x] Build `/shop` with an editorial heading, responsive product grid,
+      product cards, category navigation with counts and a product-count
+      display.
+- [x] Implement working search, category filtering, sorting, active-filter
+      indicators, clear-filters and an empty state that explains how to
+      recover.
+- [x] Provide a desktop filter sidebar and an accessible mobile filter panel
+      built on the shared modal contract.
+- [x] Add `/shop/[slug]` preview routes (12 static paths) so every card leads
+      to a working page, with sibling-piece and category links.
+- [x] Extend the navigation and the homepage so the catalogue is reachable,
+      without breaking the existing homepage sections.
+- [x] Extend the Playwright suite to cover search, filtering, sorting, active
+      indicators, empty states, product navigation and the mobile panel.
+
+**Still open for the next phase**
+
+- [ ] Replace the demonstration catalogue with a real data source (typed
+      product records, variants, sizes and availability).
+- [ ] Product configuration and purchasing: variant selection, stock-aware
+      "add to bag", cart and hosted checkout (see Phase 4).
+- [ ] Replace concept imagery with studio photography.
 
 ## Phase 4 — commerce integration
 
