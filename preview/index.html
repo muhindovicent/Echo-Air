@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#f5f2e9" />
+  <meta name="description" content="Echo & Air — an editorial streetwear storefront concept. Preview the proposed visual direction." />
+  <title>Echo & Air — Storefront Design Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Azeret+Mono:wght@400;500;600;700&family=DM+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,wght@0,500;0,600;1,500;1,600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="./styles.css" />
+  <script src="./main.js" defer></script>
+</head>
+<body id="top">
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <div class="prototype-banner" role="note">
+    <span>DESIGN PREVIEW</span>
+    <span>Visual prototype — no live products, orders or checkout</span>
+  </div>
+
+  <header class="site-header" id="site-header">
+    <div class="nav-container">
+      <a href="#top" class="wordmark" aria-label="Echo and Air, back to top">ECHO<span class="wordmark-amp">&</span>AIR<span class="wordmark-dot" aria-hidden="true">.</span></a>
+      <nav class="primary-nav" id="primary-nav" aria-label="Primary navigation">
+        <a href="#collection">Collection</a>
+        <a href="#editorial">The edit</a>
+        <a href="#story">Our world</a>
+      </nav>
+      <div class="header-actions">
+        <a class="header-link" href="#collection">Explore pieces <span aria-hidden="true">↗</span></a>
+        <button type="button" class="menu-toggle" aria-expanded="false" aria-controls="primary-nav" aria-label="Open navigation menu">
+          <span aria-hidden="true"></span><span aria-hidden="true"></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <section class="hero section-shell" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <div class="eyebrow"><span class="status-dot" aria-hidden="true"></span> UNFILTERED STREETWEAR <span class="serial">/ 001</span></div>
+        <h1 id="hero-title">Wear it<br><em>your</em> way<span class="title-stop">.</span></h1>
+        <p class="hero-description">Clothing as an attitude. A new visual direction for Echo & Air: sharp silhouettes, expressive details and less noise.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-dark" href="#collection">Explore the edit <span aria-hidden="true">↗</span></a>
+          <a class="text-link" href="#story">Discover the vision <span aria-hidden="true">↗</span></a>
+        </div>
+        <div class="hero-index"><span>INDEPENDENT EXPRESSION</span><span>EST. —</span></div>
+      </div>
+      <div class="hero-media">
+        <img src="https://images.unsplash.com/photo-1529139574466-a303027c1d8b?w=1200&q=85" width="1000" height="1250" alt="Editorial street-style fashion portrait used as concept photography" fetchpriority="high" />
+        <div class="hero-media-label"><span>THE ECHO & AIR EDIT</span><span>001 / 026</span></div>
+        <div class="hero-stamp" aria-hidden="true">EA<br><small>STUDIO</small></div>
+      </div>
+    </section>
+
+    <div class="running-strip" aria-hidden="true">
+      <div class="running-content">ECHO & AIR <span>✳</span> REWRITE THE UNIFORM <span>✳</span> ECHO & AIR <span>✳</span> UNFILTERED STREETWEAR <span>✳</span> ECHO & AIR <span>✳</span> REWRITE THE UNIFORM <span>✳</span></div>
+    </div>
+
+    <section class="collection section-shell section-space" id="collection" aria-labelledby="collection-title">
+      <div class="section-topline"><span>01 / THE COLLECTION</span><span>EXPLORE THE DIRECTION</span></div>
+      <div class="section-heading-row">
+        <h2 id="collection-title">The <em>essentials.</em></h2>
+        <p>Everyday pieces. Distinct presence. Below is a concept gallery, not an available-to-purchase catalog.</p>
+      </div>
+      <div class="filter-bar" role="group" aria-label="Filter concept looks">
+        <button class="filter-chip is-active" type="button" data-filter="all" aria-pressed="true">All looks <span>06</span></button>
+        <button class="filter-chip" type="button" data-filter="apparel" aria-pressed="false">Apparel</button>
+        <button class="filter-chip" type="button" data-filter="accessories" aria-pressed="false">Footwear & accessories</button>
+        <span class="filter-result" id="filter-result" aria-live="polite">6 looks</span>
+      </div>
+      <div class="look-grid">
+        <article class="look-card" data-category="apparel">
+          <div class="look-image"><img src="https://images.unsplash.com/photo-1521572163474-6864f9cf17ab?w=750&q=80" loading="lazy" width="700" height="850" alt="Plain T-shirt, example styling photograph" /><span class="look-number">LOOK 01</span></div>
+          <div class="look-info"><h3>Everyday tees</h3><span>APPAREL</span></div>
+        </article>
+        <article class="look-card" data-category="apparel">
+          <div class="look-image"><img src="https://images.unsplash.com/photo-1542272604-787c3835535d?w=750&q=80" loading="lazy" width="700" height="850" alt="Blue denim jeans, example styling photograph" /><span class="look-number">LOOK 02</span></div>
+          <div class="look-info"><h3>Denim essentials</h3><span>APPAREL</span></div>
+        </article>
+        <article class="look-card" data-category="apparel">
+          <div class="look-image"><img src="https://images.unsplash.com/photo-1551028719-00167b16eac5?w=750&q=80" loading="lazy" width="700" height="850" alt="Outerwear styling photograph" /><span class="look-number">LOOK 03</span></div>
+          <div class="look-info"><h3>Statement layers</h3><span>APPAREL</span></div>
+        </article>
+        <article class="look-card" data-category="accessories">
+          <div class="look-image"><img src="https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=750&q=80" loading="lazy" width="700" height="850" alt="Red sneaker, example footwear photograph" /><span class="look-number">LOOK 04</span></div>
+          <div class="look-info"><h3>Street footwear</h3><span>FOOTWEAR</span></div>
+        </article>
+        <article class="look-card" data-category="apparel">
+          <div class="look-image"><img src="https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=750&q=80" loading="lazy" width="700" height="850" alt="Hooded sweatshirt, example styling photograph" /><span class="look-number">LOOK 05</span></div>
+          <div class="look-info"><h3>Off-duty layers</h3><span>APPAREL</span></div>
+        </article>
+        <article class="look-card" data-category="accessories">
+          <div class="look-image"><img src="https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=750&q=80" loading="lazy" width="700" height="850" alt="Accessories backpack, example styling photograph" /><span class="look-number">LOOK 06</span></div>
+          <div class="look-info"><h3>Daily carry</h3><span>ACCESSORIES</span></div>
+        </article>
+      </div>
+      <p class="catalog-note">Concept imagery is drawn from the existing website's sample photography. Replace with owned or appropriately licensed brand and product assets before launch.</p>
+    </section>
+
+    <section class="editorial" id="editorial" aria-labelledby="editorial-title">
+      <div class="editorial-visual">
+        <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1300&q=85" loading="lazy" width="1100" height="1100" alt="Editorial fashion styling photograph for the visual prototype" />
+        <span class="editorial-photo-note">THE EDIT / VOL. 01</span>
+      </div>
+      <div class="editorial-copy">
+        <div class="eyebrow light-eyebrow">02 / THE EDIT</div>
+        <h2 id="editorial-title">No rules.<br><em>Just style.</em></h2>
+        <p>Echo & Air sits between the everyday and the unexpected. This visual language puts fashion imagery first and leaves room for the pieces to speak.</p>
+        <a href="#story" class="btn btn-light">Inside our world <span aria-hidden="true">↗</span></a>
+        <div class="editorial-footnote">AN EDITORIAL APPROACH TO THE EVERYDAY</div>
+      </div>
+    </section>
+
+    <section class="story section-shell section-space" id="story" aria-labelledby="story-title">
+      <div class="section-topline"><span>03 / OUR WORLD</span><span>THE BRAND DIRECTION</span></div>
+      <div class="story-grid">
+        <h2 id="story-title">Make<br><em>your mark.</em></h2>
+        <div class="story-copy">
+          <p>Echo & Air is being shaped as a clothing destination for people who use personal style to express themselves.</p>
+          <p>This first design step establishes the visual identity and responsive structure. Verified product information, real checkout and business policies will follow in later phases.</p>
+          <a href="#top" class="text-link">Back to the top <span aria-hidden="true">↑</span></a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-topline"><span>THE NEXT CHAPTER IS YOURS</span><span>DESIGN PREVIEW / 2026</span></div>
+    <div class="footer-wordmark">ECHO<span>&</span>AIR<span class="footer-dot">.</span></div>
+    <div class="footer-bottom"><span>© 2026 ECHO & AIR — CONCEPT PREVIEW</span><span>NOT YET AN ONLINE STORE</span><a href="#top">BACK TO TOP ↑</a></div>
+  </footer>
+</body>
+</html>
