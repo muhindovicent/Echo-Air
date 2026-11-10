@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { SiteHeader } from "@/components/chrome/SiteHeader";
+import { WishlistProvider } from "@/components/shop/WishlistProvider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -67,9 +68,11 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        <SiteHeader />
-        <main id="main">{children}</main>
-        <SiteFooter />
+        <WishlistProvider>
+          <SiteHeader />
+          <main id="main">{children}</main>
+          <SiteFooter />
+        </WishlistProvider>
       </body>
     </html>
   );

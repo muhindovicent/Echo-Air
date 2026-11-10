@@ -124,4 +124,44 @@ test.describe("review screenshots", () => {
       quality: 78,
     });
   });
+
+  test("captures the gallery zoom view", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/shop/longform-overcoat");
+
+    await page.getByTestId("gallery-zoom").click();
+    await expect(
+      page.getByRole("dialog", { name: /enlarged view/i }),
+    ).toBeVisible();
+
+    await page.screenshot({
+      path: path.join(OUT, "gallery-zoom-1440.jpg"),
+      type: "jpeg",
+      quality: 78,
+    });
+  });
+
+  for (const shot of [
+    { name: "wishlist-desktop-1440", width: 1440, height: 900 },
+    { name: "wishlist-mobile-375", width: 375, height: 812 },
+  ]) {
+    test(`captures ${shot.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: shot.width, height: shot.height });
+      await page.goto("/shop/longform-overcoat");
+      await page.getByTestId("wishlist-toggle").click();
+      await page.goto("/wishlist");
+      await settle(page);
+
+      await page.screenshot({
+        path: path.join(OUT, `${shot.name}.jpg`),
+        fullPage: true,
+        type: "jpeg",
+        quality: 78,
+      });
+
+      await expect(
+        page.getByRole("heading", { name: "Longform Overcoat" }),
+      ).toBeVisible();
+    });
+  }
 });

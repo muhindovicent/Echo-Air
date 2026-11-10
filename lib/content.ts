@@ -217,6 +217,7 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
     title: "Navigate",
     links: [
       { label: "Shop", href: "/shop" },
+      { label: "Wishlist", href: "/wishlist" },
       { label: "New Arrivals", href: "/#new-arrivals" },
       { label: "Lookbook", href: "/#lookbook" },
       { label: "Studio", href: "/#studio" },

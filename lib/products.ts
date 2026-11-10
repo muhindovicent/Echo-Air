@@ -10,9 +10,12 @@
  * Imagery comes from `public/concept` — the placeholder frames carried over
  * from the legacy prototype. Every frame is tagged "Concept" on screen and
  * the catalogue labels itself as demonstration data.
+ *
+ * A product's `views` are always crops of the **same** source frame, so a
+ * gallery never shows an unrelated photograph as an alternative view of the
+ * same garment. Products with a single frame simply have one view and the
+ * gallery renders without switching controls.
  */
-
-import { conceptImages } from "@/lib/content";
 
 export const PRODUCT_CATEGORIES = [
   { slug: "outerwear", label: "Outerwear" },
@@ -27,6 +30,23 @@ export type ProductCategory = (typeof PRODUCT_CATEGORIES)[number]["slug"];
 
 export const ALL_CATEGORIES = "all" as const;
 export type CategoryFilter = ProductCategory | typeof ALL_CATEGORIES;
+
+/** One frame of a product. Always from the same source photograph. */
+export type ProductView = {
+  id: string;
+  src: string;
+  alt: string;
+  /** Short caption, e.g. "Frame" or "Detail". */
+  label: string;
+};
+
+/** A demonstration colourway. No stock or availability data. */
+export type ProductColour = {
+  id: string;
+  name: string;
+  /** Swatch colour used by the selector. */
+  swatch: string;
+};
 
 export type Product = {
   /** Stable identifier used in the `/shop/[slug]` route. */
@@ -44,17 +64,46 @@ export type Product = {
   description: string;
   /** Intended construction notes. */
   details: readonly string[];
-  /** Intended colourway name. */
+  /** Intended colourway name of the primary frame. */
   colourway: string;
-  /** Primary concept frame. */
-  image: string;
-  /** Additional concept frames. */
-  gallery: readonly string[];
+  /** Frames of this product, in display order. */
+  views: readonly ProductView[];
+  /** Demonstration size labels. Not a stock list. */
+  sizes: readonly string[];
+  /** Demonstration colourway labels. Not a stock list. */
+  colours: readonly ProductColour[];
   /** Always true: nothing in this catalogue is a purchasable product. */
   isConcept: true;
   /** Always "not-for-sale": no stock or ordering state exists yet. */
   availability: "not-for-sale";
 };
+
+/** Demonstration size labels per category. Not measurements, not stock. */
+const APPAREL_SIZES = ["S", "M", "L"] as const;
+const FOOTWEAR_SIZES = ["40", "41", "42"] as const;
+const ONE_SIZE = ["One size"] as const;
+
+export const DEMONSTRATION_VARIANT_NOTE =
+  "Demonstration variants only — no sizes, colourways or stock levels are published.";
+
+function sizesFor(category: ProductCategory): readonly string[] {
+  switch (category) {
+    case "footwear":
+      return FOOTWEAR_SIZES;
+    case "accessories":
+      return ONE_SIZE;
+    default:
+      return APPAREL_SIZES;
+  }
+}
+
+function coloursFor(...entries: [string, string][]): readonly ProductColour[] {
+  return entries.map(([id, swatch]) => ({
+    id,
+    name: id.charAt(0).toUpperCase() + id.slice(1),
+    swatch,
+  }));
+}
 
 export const PRODUCTS: readonly Product[] = [
   {
@@ -72,8 +121,22 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: oversized, long over the knee",
     ],
     colourway: "Black",
-    image: conceptImages.outerwear,
-    gallery: [conceptImages.campaign, conceptImages.lookFour],
+    views: [
+      {
+        id: "longform-overcoat-frame",
+        src: "/concept/piece-outerwear.jpg",
+        alt: "Concept image: detail of an oiled leather overcoat with hardware and zips",
+        label: "Frame",
+      },
+      {
+        id: "longform-overcoat-detail",
+        src: "/concept/look-04.jpg",
+        alt: "Concept image: folded leather panel of the same overcoat",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("outerwear"),
+    colours: coloursFor(["black", "#14161a"], ["bone", "#cfc9bb"], ["graphite", "#3b4046"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -92,8 +155,22 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: wide, mid-rise, full length",
     ],
     colourway: "Bone",
-    image: conceptImages.featured,
-    gallery: [conceptImages.lookTwo, conceptImages.featured],
+    views: [
+      {
+        id: "field-wide-trouser-frame",
+        src: "/concept/featured.jpg",
+        alt: "Concept image: full-length styling shot of a wide straight leg trouser",
+        label: "Frame",
+      },
+      {
+        id: "field-wide-trouser-detail",
+        src: "/concept/featured-detail.jpg",
+        alt: "Concept image: close detail of the same striped trouser leg",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("trousers"),
+    colours: coloursFor(["bone", "#cfc9bb"], ["black", "#14161a"], ["olive", "#5c6046"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -112,8 +189,22 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: regular, slightly long in the body",
     ],
     colourway: "Black",
-    image: conceptImages.sleeve,
-    gallery: [conceptImages.sleeve],
+    views: [
+      {
+        id: "signal-long-sleeve-frame",
+        src: "/concept/piece-sleeve.jpg",
+        alt: "Concept image: dark long sleeve garment on a hanger",
+        label: "Frame",
+      },
+      {
+        id: "signal-long-sleeve-detail",
+        src: "/concept/piece-sleeve-detail.jpg",
+        alt: "Concept image: shoulder and collar detail of the same garment",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("knitwear"),
+    colours: coloursFor(["black", "#14161a"], ["bone", "#cfc9bb"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -132,8 +223,22 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: close, cropped at the waist",
     ],
     colourway: "Black",
-    image: conceptImages.bomber,
-    gallery: [conceptImages.bomber, conceptImages.campaign],
+    views: [
+      {
+        id: "bomber-shell-frame",
+        src: "/concept/piece-bomber.jpg",
+        alt: "Concept image: cropped bomber shell layered over a tee",
+        label: "Frame",
+      },
+      {
+        id: "bomber-shell-detail",
+        src: "/concept/piece-bomber-detail.jpg",
+        alt: "Concept image: shoulder and lapel detail of the same shell",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("outerwear"),
+    colours: coloursFor(["black", "#14161a"], ["graphite", "#3b4046"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -152,8 +257,16 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: true to size, narrow through the midfoot",
     ],
     colourway: "Tonal",
-    image: conceptImages.runner,
-    gallery: [conceptImages.runner],
+    views: [
+      {
+        id: "interval-runner-frame",
+        src: "/concept/piece-runner.jpg",
+        alt: "Concept image: low profile sneaker on a plain surface",
+        label: "Frame",
+      },
+    ],
+    sizes: sizesFor("footwear"),
+    colours: coloursFor(["tonal", "#4a4f56"], ["bone", "#cfc9bb"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -171,9 +284,23 @@ export const PRODUCTS: readonly Product[] = [
       "Concept spec: plain waistband, straight side seam",
       "Intended fit: wide straight, mid-rise",
     ],
-    colourway: "Dark Indigo",
-    image: conceptImages.denim,
-    gallery: [conceptImages.lookThree, conceptImages.denim],
+    colourway: "Light Indigo",
+    views: [
+      {
+        id: "null-denim-frame",
+        src: "/concept/piece-denim.jpg",
+        alt: "Concept image: folded light indigo denim",
+        label: "Frame",
+      },
+      {
+        id: "null-denim-detail",
+        src: "/concept/piece-denim-detail.jpg",
+        alt: "Concept image: close detail of the same denim leg",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("trousers"),
+    colours: coloursFor(["light indigo", "#5a6b86"], ["washed black", "#1c1e22"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -192,8 +319,22 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: boxy, wide body",
     ],
     colourway: "Black",
-    image: conceptImages.jersey,
-    gallery: [conceptImages.jersey, conceptImages.studio],
+    views: [
+      {
+        id: "frame-tee-frame",
+        src: "/concept/piece-jersey.jpg",
+        alt: "Concept image: plain dark jersey tee on a hanger",
+        label: "Frame",
+      },
+      {
+        id: "frame-tee-detail",
+        src: "/concept/piece-jersey-detail.jpg",
+        alt: "Concept image: shoulder detail of the same tee",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("jersey"),
+    colours: coloursFor(["black", "#14161a"], ["bone", "#cfc9bb"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -212,8 +353,16 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: medium frame, wide lens",
     ],
     colourway: "Tortoise",
-    image: conceptImages.lookOne,
-    gallery: [conceptImages.lookOne],
+    views: [
+      {
+        id: "signal-frames-frame",
+        src: "/concept/look-01.jpg",
+        alt: "Concept image: shield frames worn in hard sunlight",
+        label: "Frame",
+      },
+    ],
+    sizes: sizesFor("accessories"),
+    colours: coloursFor(["tortoise", "#7a4a24"], ["black", "#14161a"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -232,8 +381,16 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: straight, cropped at the ankle",
     ],
     colourway: "Charcoal",
-    image: conceptImages.lookTwo,
-    gallery: [conceptImages.lookTwo],
+    views: [
+      {
+        id: "interval-trouser-frame",
+        src: "/concept/look-02.jpg",
+        alt: "Concept image: cuffed trouser leg against a concrete ledge",
+        label: "Frame",
+      },
+    ],
+    sizes: sizesFor("trousers"),
+    colours: coloursFor(["charcoal", "#3b4046"], ["black", "#14161a"]),
     isConcept: true,
     availability: "not-for-sale",
   },
@@ -252,34 +409,22 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: straight, mid-rise",
     ],
     colourway: "Washed Black",
-    image: conceptImages.lookThree,
-    gallery: [conceptImages.lookThree],
-    isConcept: true,
-    availability: "not-for-sale",
-  },
-  {
-    slug: "longform-jacket",
-    index: "11",
-    name: "Longform Jacket",
-    category: "outerwear",
-    collection: "Drop 01",
-    tagline: "Cropped biker, chrome hardware.",
-    description:
-      "A cropped biker jacket with a wide collar and chrome hardware, treated as the sharpest object in the drop and photographed accordingly.",
-    details: [
-      "Concept spec: lamb leather, cropped body",
-      "Concept spec: wide collar, chrome hardware",
-      "Intended fit: cropped, close through the body",
+    views: [
+      {
+        id: "blackout-denim-frame",
+        src: "/concept/look-03.jpg",
+        alt: "Concept image: folded black denim with tonal stitching",
+        label: "Frame",
+      },
     ],
-    colourway: "Black",
-    image: conceptImages.lookFour,
-    gallery: [conceptImages.lookFour],
+    sizes: sizesFor("trousers"),
+    colours: coloursFor(["washed black", "#1c1e22"]),
     isConcept: true,
     availability: "not-for-sale",
   },
   {
     slug: "field-tee",
-    index: "12",
+    index: "11",
     name: "Field Tee",
     category: "jersey",
     collection: "Drop 01",
@@ -292,8 +437,56 @@ export const PRODUCTS: readonly Product[] = [
       "Intended fit: boxy, wide body",
     ],
     colourway: "Optic White",
-    image: conceptImages.studio,
-    gallery: [conceptImages.studio],
+    views: [
+      {
+        id: "field-tee-frame",
+        src: "/concept/studio.jpg",
+        alt: "Concept image: plain heavyweight jersey tee in flat light",
+        label: "Frame",
+      },
+      {
+        id: "field-tee-detail",
+        src: "/concept/studio-detail.jpg",
+        alt: "Concept image: neckline detail of the same tee",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("jersey"),
+    colours: coloursFor(["optic white", "#f2f2ec"], ["bone", "#cfc9bb"]),
+    isConcept: true,
+    availability: "not-for-sale",
+  },
+  {
+    slug: "studio-tracksuit",
+    index: "12",
+    name: "Studio Tracksuit",
+    category: "outerwear",
+    collection: "Drop 01",
+    tagline: "Loopback top, matching wide leg.",
+    description:
+      "A cropped loopback top with a matching wide leg, the most casual piece in the drop and the one the campaign was shot around.",
+    details: [
+      "Concept spec: loopback cotton, brushed inside",
+      "Concept spec: rib collar and cuff, drawstring waist",
+      "Intended fit: cropped top with a wide leg",
+    ],
+    colourway: "Bone",
+    views: [
+      {
+        id: "studio-tracksuit-frame",
+        src: "/concept/hero.jpg",
+        alt: "Concept image: full-length tracksuit worn outdoors in hard light",
+        label: "Frame",
+      },
+      {
+        id: "studio-tracksuit-detail",
+        src: "/concept/tracksuit-detail.jpg",
+        alt: "Concept image: cropped detail of the same tracksuit top",
+        label: "Detail",
+      },
+    ],
+    sizes: sizesFor("outerwear"),
+    colours: coloursFor(["bone", "#cfc9bb"], ["black", "#14161a"]),
     isConcept: true,
     availability: "not-for-sale",
   },

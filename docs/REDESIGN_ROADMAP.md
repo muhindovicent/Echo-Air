@@ -119,6 +119,31 @@ green lint/typecheck/production build.
       "add to bag", cart and hosted checkout (see Phase 4).
 - [ ] Replace concept imagery with studio photography.
 
+## Phase 3b — advanced product experience
+
+**Delivered in `feat/phase-03-product-experience`** (frontend interactions only):
+
+- [x] Interactive product gallery: thumbnail rail, frame switching, an
+      enlarged view with the same keyboard controls, and arrow-key navigation
+      on the stage and on the rail.
+- [x] Per-product views are crops of the same source frame, so a gallery never
+      presents an unrelated photograph as another view of the same garment, and
+      a single-frame product renders without switching controls.
+- [x] Reusable size and colourway selectors built on real radio inputs and
+      labelled as demonstration variants.
+- [x] A demonstration size guide dialog that publishes no measurements.
+- [x] A wishlist held in React state and `localStorage`, with add/remove, a
+      `/wishlist` page, designed empty states and a count in the header.
+- [x] Cinematic frame presentation (key light, vignette, cross-fade) with the
+      existing reduced-motion rules applied.
+
+**Still out of scope**
+
+- Payments, authentication, stock management and checkout.
+- Anything that would present a demonstration piece as purchasable: there is
+  no price, no availability, no stock level and no ordering path anywhere in
+  the build.
+
 ## Phase 4 — commerce integration
 
 - Connect the selected provider (recommended: Shopify if live online sales are required).

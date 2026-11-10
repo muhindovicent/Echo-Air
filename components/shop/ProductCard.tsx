@@ -17,20 +17,26 @@ export function ProductCard({
   priority = false,
   sizes = "(min-width: 1280px) 22vw, (min-width: 1024px) 28vw, (min-width: 640px) 45vw, 92vw",
 }: ProductCardProps) {
+  const frame = product.views[0];
+
   return (
     <article className="group flex flex-col">
       <Link
         href={`/shop/${product.slug}`}
         className="flex flex-col focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-acid"
       >
-        <ConceptFigure
-          src={product.image}
-          alt={`Concept image for ${product.name}: ${product.tagline}`}
-          ratio="3 / 4"
-          sizes={sizes}
-          priority={priority}
-          focus="50% 50%"
-        />
+        {frame ? (
+          <ConceptFigure
+            src={frame.src}
+            alt={`Concept image for ${product.name}: ${product.tagline}`}
+            ratio="3 / 4"
+            sizes={sizes}
+            priority={priority}
+            focus="50% 50%"
+          />
+        ) : (
+          <div className="bg-obsidian-soft" style={{ aspectRatio: "3 / 4" }} />
+        )}
 
         <div className="mt-4 flex items-start justify-between gap-4 border-t border-bone/12 pt-3">
           <div className="min-w-0">

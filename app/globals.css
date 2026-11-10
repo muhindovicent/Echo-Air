@@ -142,6 +142,22 @@
     transform: scale(calc(var(--media-zoom, 1) * 1.06));
   }
 
+  /* Gallery frames cross-fade when the view changes. */
+  @keyframes ea-gallery-in {
+    from {
+      opacity: 0;
+      transform: scale(1.04);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  .gallery-frame-in {
+    animation: ea-gallery-in 700ms var(--ease-out-expo) both;
+  }
+
   @media (min-width: 768px) {
     .text-stroke {
       -webkit-text-stroke-width: 2px;
