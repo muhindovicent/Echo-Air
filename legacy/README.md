@@ -25,5 +25,8 @@ Known problems (unchanged from the original):
   pages do not exist.
 - Product cards, prices and checkout-style controls are placeholders; no
   commerce backend is configured.
+- The studio address, phone number and email address in these files are
+  fictional placeholders from the original prototype. They are not published
+  anywhere in the new storefront and should not be treated as contact details.
 - Old `RAWLINE` branding appears in some copy and page metadata.
 - Several hot-linked stock photographs now return 404 upstream.

@@ -42,15 +42,16 @@ export function BrandStory() {
             <Reveal delay={80}>
               <div className="space-y-6 text-[1rem] leading-relaxed text-bone/70">
                 <p>
-                  Echo &amp; Air started as a question: why does most streetwear
-                  lose its shape after one season? We design in heavier cloth,
-                  fewer seams and slower runs, so a piece keeps its line long
-                  after the drop is over.
+                  Echo &amp; Air is a working concept for a streetwear label
+                  built around weight and structure. The house rules are simple
+                  and unproven: heavier cloth, fewer seams, and silhouettes
+                  that hold their shape long after a piece leaves the studio.
                 </p>
                 <p>
-                  The work is shot in the same conditions it is made for —
-                  concrete, low light, hard shadow. If a garment only reads in a
-                  studio, it was designed for the wrong room.
+                  The visual direction follows the same logic. Campaigns should
+                  be shot in the conditions the clothes are made for — concrete,
+                  low light, hard shadow. If a garment only reads in a studio,
+                  it was designed for the wrong room.
                 </p>
                 <p>
                   This site is the first frame of that idea: a homepage built on

@@ -24,8 +24,8 @@ export function NewArrivals() {
           </div>
           <div className="md:col-span-4 md:col-start-9">
             <p className="text-lead text-bone/70">
-              Five pieces open the drop. Weight and proportion lead; hardware
-              stays out of the frame.
+              Five working titles open the drop. Weight and proportion lead;
+              hardware stays out of the frame.
             </p>
           </div>
         </div>
@@ -47,6 +47,9 @@ export function NewArrivals() {
                 <div className="md:col-span-9">
                   <h3 className="text-[clamp(1.35rem,2.2vw,1.9rem)] font-medium leading-tight tracking-[-0.02em]">
                     {featuredArrival.name}
+                    <span className="label ml-3 align-middle text-ash">
+                      Working title
+                    </span>
                   </h3>
                   <p className="label mt-3 text-acid">{featuredArrival.category}</p>
                   <p className="mt-4 max-w-xl text-[0.95rem] leading-relaxed text-bone/65">

@@ -45,10 +45,15 @@ export const navItems: NavItem[] = [
   { label: "Studio", href: "#studio" },
 ];
 
+/**
+ * Hero metadata describes the state of this build only. Season, launch dates
+ * and any other commercial detail stay unstated until the business confirms
+ * them.
+ */
 export const heroMeta: { label: string; value: string }[] = [
-  { label: "Season", value: "AW / 26" },
+  { label: "Build", value: "Phase 01 — concept" },
   { label: "Release", value: "Drop 01 — preview" },
-  { label: "Status", value: "Concept build, not on sale" },
+  { label: "Status", value: "Not on sale, no checkout" },
   { label: "Scroll", value: "01 — New arrivals" },
 ];
 
@@ -179,21 +184,26 @@ export const looks: Look[] = [
   },
 ];
 
+/**
+ * Design principles for the concept build. They describe the intended design
+ * position, not confirmed production practices — nothing here has been
+ * verified with the business.
+ */
 export const principles: { index: string; title: string; body: string }[] = [
   {
     index: "01",
     title: "Weight before logo",
-    body: "The silhouette carries the brand. Hardware is kept quiet so the fabric, the cut and the movement of the garment do the talking.",
+    body: "The silhouette should carry the brand. Hardware stays quiet so the fabric, the cut and the movement of the garment do the talking.",
   },
   {
     index: "02",
     title: "Small runs, long life",
-    body: "Pieces are produced in limited runs and designed to be repaired and re-worn rather than replaced at the end of a season.",
+    body: "The intent is limited runs and repairable pieces, designed to be re-worn rather than replaced at the end of a season.",
   },
   {
     index: "03",
     title: "Photographed in the dark",
-    body: "Campaigns are shot in low light and hard shadow. The clothes are treated as objects with a mood, not props in a set.",
+    body: "Campaigns should be shot in low light and hard shadow, treating clothes as objects with a mood rather than props in a set.",
   },
 ];
 
@@ -206,15 +216,18 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
       { label: "Studio", href: "#studio" },
     ],
   },
-  {
-    title: "Contact",
-    links: [
-      { label: "hello@echoandair.example", href: "mailto:hello@echoandair.example" },
-    ],
-  },
 ];
 
-export const contactAddress = ["Echo & Air Studio", "12 Forge Lane", "Riverton"];
+/**
+ * No verified contact channel, address or trading details exist yet, so the
+ * footer states that instead of publishing a placeholder address or an
+ * invented email address.
+ */
+export const contactStatus = {
+  label: "Contact",
+  value: "No verified contact channel yet",
+  note: "Studio address, press enquiries and stockist details are pending confirmation from the business, so none are published here.",
+};
 
 /**
  * Fixed so the build output stays deterministic (a `new Date()` read during

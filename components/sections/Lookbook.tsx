@@ -31,8 +31,8 @@ export function Lookbook() {
           </div>
           <div className="md:col-span-4 md:col-start-9">
             <p className="text-lead text-bone/70">
-              Four frames from the Drop 01 study. Hard light, hard edges, no
-              retouching of the silhouette.
+              Four frames from the Drop 01 study, with working titles. Hard
+              light, hard edges, no retouching of the silhouette.
             </p>
           </div>
         </div>

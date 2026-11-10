@@ -120,7 +120,7 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <span className="label hidden text-ash xl:block">Est. FW26</span>
+            <span className="label hidden text-ash xl:block">Phase 01</span>
             <button
               ref={toggleRef}
               type="button"

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { contactAddress, copyrightYear, footerColumns } from "@/lib/content";
+import { contactStatus, copyrightYear, footerColumns } from "@/lib/content";
 
 export function SiteFooter() {
   return (
@@ -12,16 +12,15 @@ export function SiteFooter() {
               Outerwear and heavyweight essentials built for the hours before
               and after the noise.
             </p>
-            <address className="mt-8 not-italic">
-              <p className="label text-ash">Studio</p>
-              <p className="mt-3 text-[0.95rem] leading-relaxed text-bone/70">
-                {contactAddress.map((line) => (
-                  <span key={line} className="block">
-                    {line}
-                  </span>
-                ))}
+            <div className="mt-8">
+              <p className="label text-ash">{contactStatus.label}</p>
+              <p className="mt-3 max-w-sm text-[0.95rem] leading-relaxed text-bone/70">
+                {contactStatus.value}
               </p>
-            </address>
+              <p className="mt-3 max-w-sm text-[0.85rem] leading-relaxed text-bone/50">
+                {contactStatus.note}
+              </p>
+            </div>
           </div>
 
           <div className="grid gap-10 sm:grid-cols-2 lg:col-span-4 lg:col-start-7">
@@ -31,21 +30,12 @@ export function SiteFooter() {
                 <ul className="mt-5 space-y-3">
                   {column.links.map((link) => (
                     <li key={link.href}>
-                      {link.href.startsWith("mailto:") ? (
-                        <a
-                          href={link.href}
-                          className="link-underline text-[0.95rem] text-bone/80 transition-colors duration-300 hover:text-acid"
-                        >
-                          {link.label}
-                        </a>
-                      ) : (
-                        <Link
-                          href={link.href}
-                          className="link-underline text-[0.95rem] text-bone/80 transition-colors duration-300 hover:text-acid"
-                        >
-                          {link.label}
-                        </Link>
-                      )}
+                      <Link
+                        href={link.href}
+                        className="link-underline text-[0.95rem] text-bone/80 transition-colors duration-300 hover:text-acid"
+                      >
+                        {link.label}
+                      </Link>
                     </li>
                   ))}
                 </ul>
@@ -59,7 +49,7 @@ export function SiteFooter() {
               {["Instagram", "TikTok", "X"].map((network) => (
                 <li key={network}>
                   <span className="text-[0.95rem] text-bone/45">
-                    {network} — unconfirmed
+                    {network} — no confirmed account
                   </span>
                 </li>
               ))}
@@ -70,12 +60,14 @@ export function SiteFooter() {
         <div className="mt-16 border border-bone/12 bg-obsidian p-6 md:mt-24 md:p-8">
           <p className="label text-acid">Concept disclosure</p>
           <p className="mt-4 max-w-3xl text-[0.95rem] leading-relaxed text-bone/70">
-            Every photograph on this site is concept artwork carried over from
-            the original prototype, tagged &ldquo;Concept&rdquo; on screen. Garment
+            This is a Phase 01 concept build, not a live store. Every
+            photograph on this site is placeholder artwork carried over from the
+            original prototype and tagged &ldquo;Concept&rdquo; on screen. Garment
             names are working titles for layout purposes. No pricing,
-            availability, reviews or orders are presented, and no checkout
-            exists. Brand photography and a commerce provider are required
-            before this site can sell anything.
+            availability, reviews, contact details or orders are presented, and
+            no checkout exists. Real brand photography, verified contact
+            details and a commerce provider are required before this site can
+            sell anything or publish business information.
           </p>
         </div>
 

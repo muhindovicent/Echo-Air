@@ -51,6 +51,9 @@ foundation):
       mobile menu, footer, buttons and a fixed-ratio image frame component.
 - [x] Keep every placeholder frame labelled as a concept asset and remove all
       dead navigation targets from the new build.
+- [x] Add a Playwright smoke suite (homepage rendering, dead links, responsive
+      layout and horizontal overflow, mobile menu, image loading, reduced
+      motion) and run it in CI against the production build.
 
 **Decisions taken in this phase**
 
@@ -65,6 +68,10 @@ foundation):
   in the raw stock) and tagged "Concept" on screen.
 - *Navigation.* With no catalog pages yet, the primary navigation points at
   homepage sections instead of shipping links to routes that do not exist.
+- *Unverified brand details.* The placeholder contact email and fictional
+  studio address carried over from the legacy prototype were removed. The
+  footer now states that no verified contact channel exists, and the Playwright
+  suite asserts that no invented contact data reappears.
 - *Commerce.* Still out of scope. No cart, checkout, payment form, stock
   level, price or review is presented anywhere in this build.
 

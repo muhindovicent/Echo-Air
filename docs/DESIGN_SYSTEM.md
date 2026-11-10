@@ -109,6 +109,24 @@ When the studio delivers real campaign photography, drop the files into
   is locked while it is open.
 - All controls are real `<button>` / `<a>` elements — no click handlers on
   `div`s.
+- These behaviours are covered by the Playwright suite in `tests/e2e/`.
+
+## 8b. Content rules for an unverified brand
+
+Until the business confirms real details, the interface must not assert them:
+
+- No contact email, phone number, postal address or trading details — the
+  footer states that no verified channel exists yet.
+- No social accounts are linked; the networks are listed as "no confirmed
+  account" instead.
+- No founding date, season, launch date, stockists or store locations.
+- Garment names are labelled **working titles**; principles are written as
+  intent ("should be", "the intent is"), not as confirmed practice.
+- A `Concept disclosure` block in the footer states that the site is not a live
+  store and lists everything that is placeholder.
+
+The homepage test suite asserts the absence of invented contact data so a
+placeholder address cannot reappear unnoticed.
 
 ## 9. Responsive rules
 
