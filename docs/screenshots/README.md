@@ -16,6 +16,7 @@ so reviewers can see the result without running the site.
 | `shop-desktop-1440.jpg` | Catalogue 1440×900, full page |
 | `shop-mobile-375-fold.jpg` | Catalogue 375×812, first viewport |
 | `shop-mobile-375.jpg` | Catalogue 375×812, full page |
+| `filter-panel-375.jpg` | Mobile filter panel open at 375×812 |
 | `product-desktop-1440.jpg` | Product preview 1440×900, full page |
 | `product-mobile-375.jpg` | Product preview 375×812, full page |
 

@@ -311,6 +311,14 @@ export type SortOption = (typeof SORT_OPTIONS)[number]["value"];
 export const CATALOGUE_DISCLAIMER =
   "Demonstration catalogue. Every piece is a working title for layout purposes — no pricing, stock, sizing, reviews or ordering exists.";
 
+/**
+ * Short form used on small screens, where the full paragraph pushed the
+ * search field and the products too far down the page. The full wording stays
+ * in the footer disclosure on every screen size.
+ */
+export const CATALOGUE_DISCLAIMER_SHORT =
+  "Demonstration data — nothing here can be ordered.";
+
 export function categoryLabel(slug: CategoryFilter): string {
   if (slug === ALL_CATEGORIES) return "All pieces";
   return (

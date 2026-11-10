@@ -58,10 +58,7 @@ test.describe("catalogue", () => {
 
     // The catalogue labels itself as demonstration data.
     await expect(
-      page.getByText("Demonstration catalogue", { exact: false }).first(),
-    ).toBeVisible();
-    await expect(
-      page.getByText(/no pricing, stock, sizing, reviews or ordering/i).first(),
+      page.getByText(/demonstration (catalogue|data)/i).first(),
     ).toBeVisible();
 
     // No commercial information is published.
@@ -282,6 +279,234 @@ test.describe("catalogue on small screens", () => {
     await page.keyboard.press("Escape");
     await expect(panel).toHaveCount(0);
     expect(await page.evaluate(() => document.body.style.overflow)).toBe("");
+  });
+
+  test("keeps the panel controls readable on the off-white surface", async ({
+    page,
+  }) => {
+    await openShop(page);
+
+    await page.getByRole("button", { name: /^filters$/i }).click();
+    const panel = page.getByRole("dialog", { name: "Catalogue filters" });
+    await expect(panel).toBeVisible();
+
+    // Colours are resolved inside the browser so every CSS colour format
+    // (rgb, oklab, color-mix) is handled the way it is actually painted.
+    const results = await panel.evaluate((node) => {
+      const canvas = document.createElement("canvas");
+      const context = canvas.getContext("2d");
+
+      const parse = (color: string) => {
+        if (!context) return null;
+        context.fillStyle = "#000000";
+        context.fillStyle = color;
+        const value = context.fillStyle;
+
+        if (value.startsWith("#")) {
+          const hex = value.slice(1);
+          const full =
+            hex.length === 3
+              ? hex
+                  .split("")
+                  .map((char) => char + char)
+                  .join("")
+              : hex;
+          const number = Number.parseInt(full, 16);
+          return {
+            r: (number >> 16) & 255,
+            g: (number >> 8) & 255,
+            b: number & 255,
+            a: 1,
+          };
+        }
+
+        const match = value.match(/rgba?\(([^)]+)\)/);
+        if (!match) return null;
+        const parts = match[1]
+          .split(/[,\s/]+/)
+          .filter(Boolean)
+          .map(Number);
+        return {
+          r: parts[0],
+          g: parts[1],
+          b: parts[2],
+          a: parts.length > 3 ? parts[3] : 1,
+        };
+      };
+
+      const luminance = (color: { r: number; g: number; b: number }) => {
+        const channel = (value: number) => {
+          const scaled = value / 255;
+          return scaled <= 0.03928
+            ? scaled / 12.92
+            : ((scaled + 0.055) / 1.055) ** 2.4;
+        };
+        return (
+          0.2126 * channel(color.r) +
+          0.7152 * channel(color.g) +
+          0.0722 * channel(color.b)
+        );
+      };
+
+      const panelColor = parse(getComputedStyle(node).backgroundColor);
+      if (!panelColor) return [];
+
+      /** The painted backdrop behind an element, compositing its ancestors. */
+      const backdropOf = (element: Element) => {
+        const layers: { r: number; g: number; b: number; a: number }[] = [];
+        let current: Element | null = element;
+
+        while (current && current !== document.body) {
+          const background = parse(getComputedStyle(current).backgroundColor);
+          if (background && background.a > 0) {
+            layers.push(background);
+            if (background.a === 1) break;
+          }
+          current = current.parentElement;
+        }
+
+        let result = { ...panelColor };
+        for (let index = layers.length - 1; index >= 0; index -= 1) {
+          const layer = layers[index];
+          result = {
+            r: layer.r * layer.a + result.r * (1 - layer.a),
+            g: layer.g * layer.a + result.g * (1 - layer.a),
+            b: layer.b * layer.a + result.b * (1 - layer.a),
+            a: 1,
+          };
+        }
+        return result;
+      };
+
+      const controls = Array.from(
+        node.querySelectorAll<HTMLElement>("button, select, label, p, span"),
+      ).filter((element) => element.getClientRects().length > 0);
+
+      return controls.map((element) => {
+        const style = getComputedStyle(element);
+        const foreground = parse(style.color);
+        if (!foreground) {
+          return { text: element.textContent?.trim() ?? "", ratio: 0 };
+        }
+
+        // Composite any transparency over the painted backdrop.
+        const background = backdropOf(element);
+        const blended = {
+          r: foreground.r * foreground.a + background.r * (1 - foreground.a),
+          g: foreground.g * foreground.a + background.g * (1 - foreground.a),
+          b: foreground.b * foreground.a + background.b * (1 - foreground.a),
+        };
+
+        const first = luminance(blended);
+        const second = luminance(background);
+        const lighter = Math.max(first, second);
+        const darker = Math.min(first, second);
+
+        return {
+          text: (element.textContent ?? "").trim().slice(0, 40),
+          ratio: Math.round(((lighter + 0.05) / (darker + 0.05)) * 100) / 100,
+        };
+      });
+    });
+
+    expect(results.length).toBeGreaterThan(0);
+
+    const failures = results.filter((entry) => entry.ratio < 4.5);
+    expect(
+      failures,
+      `low contrast: ${failures
+        .map((entry) => `${entry.text} (${entry.ratio}:1)`)
+        .join(", ")}`,
+    ).toEqual([]);
+  });
+
+  test("returns focus to the Filters button when the panel closes", async ({
+    page,
+  }) => {
+    await openShop(page);
+
+    const toggle = page.getByRole("button", { name: /^filters$/i });
+    await toggle.click();
+
+    const panel = page.getByRole("dialog", { name: "Catalogue filters" });
+    await expect(panel).toBeVisible();
+    await expect(panel.locator(":focus")).toHaveCount(1);
+
+    await page.keyboard.press("Escape");
+
+    await expect(panel).toHaveCount(0);
+    await expect(toggle).toBeFocused();
+  });
+
+  test("returns focus to the Filters button after choosing a category", async ({
+    page,
+  }) => {
+    await openShop(page);
+
+    const toggle = page.getByRole("button", { name: /^filters$/i });
+    await toggle.click();
+
+    const panel = page.getByRole("dialog", { name: "Catalogue filters" });
+    await panel.locator("#panel-category-footwear").click();
+
+    await expect(panel).toHaveCount(0);
+    await expect(toggle).toBeFocused();
+  });
+
+  test("reaches search and the grid without scrolling far on mobile", async ({
+    page,
+  }) => {
+    await openShop(page);
+
+    const search = page.getByLabel("Search the catalogue");
+    const filters = page.getByRole("button", { name: /^filters$/i });
+
+    // The search field and the filter control are reachable in the first
+    // viewport instead of below a long introduction.
+    await expect(search).toBeInViewport();
+    await expect(filters).toBeInViewport();
+
+    const introHeight = await page
+      .locator("h1")
+      .evaluate((node) => node.getBoundingClientRect().bottom);
+    expect(introHeight).toBeLessThan(420);
+  });
+});
+
+test.describe("product page hierarchy", () => {
+  test("shows the main image above the construction notes on mobile", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/shop/longform-overcoat");
+
+    const figure = page.locator("main figure").first();
+    const notes = page.getByText("Construction notes");
+
+    await expect(figure).toBeVisible();
+    await expect(notes).toBeAttached();
+
+    const figureBox = await figure.boundingBox();
+    const notesBox = await notes.boundingBox();
+
+    expect(figureBox).not.toBeNull();
+    expect(notesBox).not.toBeNull();
+    expect(figureBox!.y).toBeLessThan(notesBox!.y);
+  });
+
+  test("keeps the image in the right column on desktop", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/shop/longform-overcoat");
+
+    const figure = page.locator("main figure").first();
+    const heading = page.getByRole("heading", { level: 1 });
+
+    const figureBox = await figure.boundingBox();
+    const headingBox = await heading.boundingBox();
+
+    expect(figureBox).not.toBeNull();
+    expect(headingBox).not.toBeNull();
+    expect(figureBox!.x).toBeGreaterThan(headingBox!.x);
   });
 });
 

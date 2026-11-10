@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useState, useSyncExternalStore } from "react";
+import { useCallback, useMemo, useRef, useState, useSyncExternalStore } from "react";
 import { CategoryFilterList } from "@/components/shop/CategoryFilterList";
 import { FilterPanel } from "@/components/shop/FilterPanel";
 import { ProductCard } from "@/components/shop/ProductCard";
@@ -116,6 +116,7 @@ function useFilters(): {
  */
 export function ShopBrowser({ products }: ShopBrowserProps) {
   const [panelOpen, setPanelOpen] = useState(false);
+  const filtersButtonRef = useRef<HTMLButtonElement>(null);
   const { filters, setFilters } = useFilters();
   const { query, category, sort } = filters;
 
@@ -142,7 +143,7 @@ export function ShopBrowser({ products }: ShopBrowserProps) {
 
   return (
     <div>
-      <div className="flex flex-col gap-5 border-b border-bone/12 pb-6 md:flex-row md:items-end md:justify-between">
+      <div className="flex flex-col gap-5 border-b border-bone/12 pb-5 md:flex-row md:items-end md:justify-between md:pb-6">
         <div className="w-full md:max-w-sm">
           <label htmlFor="catalog-search" className="label text-ash">
             Search the catalogue
@@ -169,6 +170,7 @@ export function ShopBrowser({ products }: ShopBrowserProps) {
             {resultLabel}
           </p>
           <button
+            ref={filtersButtonRef}
             type="button"
             onClick={() => setPanelOpen(true)}
             aria-controls="filter-panel"
@@ -221,7 +223,7 @@ export function ShopBrowser({ products }: ShopBrowserProps) {
         </div>
       ) : null}
 
-      <div className="mt-10 grid gap-10 lg:grid-cols-12 lg:gap-8">
+      <div className="mt-8 grid gap-10 lg:mt-10 lg:grid-cols-12 lg:gap-8">
         <aside
           aria-label="Catalogue filters"
           className="hidden lg:col-span-3 lg:block"
@@ -318,6 +320,7 @@ export function ShopBrowser({ products }: ShopBrowserProps) {
           clearFilters();
           setPanelOpen(false);
         }}
+        returnFocusRef={filtersButtonRef}
       />
     </div>
   );

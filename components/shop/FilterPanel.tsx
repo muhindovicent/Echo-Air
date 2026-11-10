@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useRef } from "react";
+import { useCallback, useRef, type RefObject } from "react";
 import { useModalDialog } from "@/components/ui/useModalDialog";
 import { CategoryFilterList, type CategoryCount } from "@/components/shop/CategoryFilterList";
 import { SortControl } from "@/components/shop/SortControl";
@@ -15,12 +15,17 @@ type FilterPanelProps = {
   sort: SortOption;
   onSortChange: (value: SortOption) => void;
   onClear: () => void;
+  /** Control that opened the panel; focus returns here when it closes. */
+  returnFocusRef?: RefObject<HTMLElement | null>;
 };
 
 /**
  * Mobile filter panel. Same dialog contract as the mobile navigation: modal
  * semantics, focus moved in, focus trapped, `Escape` to close, background
- * scrolling locked.
+ * scrolling locked and focus returned to the button that opened it.
+ *
+ * The panel sits on the off-white surface, so its controls use the light
+ * tone of the shared components.
  */
 export function FilterPanel({
   open,
@@ -31,13 +36,17 @@ export function FilterPanel({
   sort,
   onSortChange,
   onClear,
+  returnFocusRef,
 }: FilterPanelProps) {
   const panelRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
 
   const handleClose = useCallback(() => onClose(), [onClose]);
 
-  useModalDialog(open, handleClose, panelRef, closeRef);
+  useModalDialog(open, handleClose, panelRef, {
+    initialFocusRef: closeRef,
+    returnFocusRef,
+  });
 
   if (!open) return null;
 
@@ -56,15 +65,15 @@ export function FilterPanel({
         role="dialog"
         aria-modal="true"
         aria-label="Catalogue filters"
-        className="absolute inset-x-0 bottom-0 max-h-[88svh] overflow-y-auto border-t border-bone/15 bg-bone text-obsidian"
+        className="absolute inset-x-0 bottom-0 max-h-[88svh] overflow-y-auto border-t border-obsidian/20 bg-bone text-obsidian"
       >
-        <div className="sticky top-0 flex items-center justify-between border-b border-obsidian/15 bg-bone px-5 py-4">
+        <div className="sticky top-0 flex items-center justify-between border-b border-obsidian/20 bg-bone px-5 py-4">
           <p className="label">Filters</p>
           <button
             ref={closeRef}
             type="button"
             onClick={handleClose}
-            className="label border border-obsidian/25 px-4 py-3 transition-colors duration-300 hover:bg-obsidian hover:text-bone"
+            className="label border border-obsidian/30 px-4 py-3 text-obsidian transition-colors duration-300 hover:bg-obsidian hover:text-bone"
           >
             Close
           </button>
@@ -72,7 +81,7 @@ export function FilterPanel({
 
         <div className="space-y-8 px-5 py-6">
           <div>
-            <p className="label text-obsidian/55">Category</p>
+            <p className="label text-ink-soft">Category</p>
             <div className="mt-3">
               <CategoryFilterList
                 counts={counts}
@@ -80,6 +89,7 @@ export function FilterPanel({
                 onChange={onCategoryChange}
                 idPrefix="panel-category"
                 layout="chips"
+                tone="light"
               />
             </div>
           </div>
@@ -96,7 +106,7 @@ export function FilterPanel({
           <button
             type="button"
             onClick={onClear}
-            className="label w-full border border-obsidian/25 px-4 py-3 text-obsidian transition-colors duration-300 hover:bg-obsidian hover:text-bone"
+            className="label w-full border border-obsidian/30 px-4 py-3 text-obsidian transition-colors duration-300 hover:bg-obsidian hover:text-bone"
           >
             Clear filters
           </button>

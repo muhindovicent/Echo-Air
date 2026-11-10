@@ -9,6 +9,14 @@ Regenerate these crops from `assets/concept-source/` with:
 python tools/crop_concept_assets.py
 ```
 
+Then clear the Next.js image optimiser cache before rebuilding — it is keyed by
+URL rather than file content, so it otherwise keeps serving the previous crop:
+
+```bash
+rm -rf .next/cache/images    # macOS / Linux
+Remove-Item -Recurse -Force .next\cache\images   # Windows
+```
+
 | File                   | Source frame                    | Crop                             |
 | ---------------------- | ------------------------------- | -------------------------------- |
 | `hero.jpg`             | `look-04.jpg` (full length)     | full frame                       |

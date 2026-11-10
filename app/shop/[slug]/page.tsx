@@ -59,8 +59,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
             </Link>
           </nav>
 
-          <div className="grid gap-10 lg:grid-cols-12 lg:gap-8">
-            <div className="lg:col-span-6">
+          <div className="grid gap-8 lg:grid-cols-12 lg:gap-8">
+            <div className="lg:col-span-6 lg:col-start-1 lg:row-start-1">
               <p className="label text-acid">
                 {product.index} — {product.collection}
               </p>
@@ -73,11 +73,39 @@ export default async function ProductPage({ params }: ProductPageProps) {
               <p className="label mt-4 text-ash">
                 {categoryLabel(product.category)} — {product.colourway}
               </p>
-              <p className="mt-8 max-w-xl text-lead text-bone/75">
+              <p className="mt-6 max-w-xl text-lead text-bone/75">
                 {product.description}
               </p>
+            </div>
 
-              <div className="mt-10 border border-bone/12 bg-obsidian-soft p-6">
+            {/* The main frame sits directly under the heading on small screens
+                and moves to the right-hand column on large ones. */}
+            <div className="lg:col-span-5 lg:col-start-8 lg:row-start-1 lg:row-span-2 lg:self-start">
+              <ConceptFigure
+                src={product.image}
+                alt={`Concept image for ${product.name}: ${product.tagline}`}
+                ratio="4 / 5"
+                sizes="(min-width: 1024px) 38vw, 92vw"
+                priority
+              />
+
+              {product.gallery.length > 1 ? (
+                <div className="mt-6 grid grid-cols-2 gap-6">
+                  {product.gallery.slice(1).map((image) => (
+                    <ConceptFigure
+                      key={image}
+                      src={image}
+                      alt={`Additional concept frame for ${product.name}`}
+                      ratio="1 / 1"
+                      sizes="(min-width: 1024px) 19vw, 44vw"
+                    />
+                  ))}
+                </div>
+              ) : null}
+            </div>
+
+            <div className="lg:col-span-6 lg:col-start-1 lg:row-start-2">
+              <div className="border border-bone/12 bg-obsidian-soft p-6">
                 <p className="label text-acid">Demonstration product</p>
                 <p className="mt-3 text-[0.9rem] leading-relaxed text-bone/65">
                   This is a working title for a piece that does not exist yet.
@@ -86,7 +114,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </p>
               </div>
 
-              <dl className="mt-10 border-t border-bone/12">
+              <dl className="mt-8 border-t border-bone/12">
                 <div className="border-b border-bone/12 py-5">
                   <dt className="label text-ash">Construction notes</dt>
                   <dd>
@@ -121,7 +149,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
                 </div>
               </dl>
 
-              <div className="mt-10 flex flex-wrap items-center gap-4">
+              <div className="mt-8 flex flex-wrap items-center gap-4">
                 <Link
                   href="/shop"
                   className="label inline-flex items-center gap-3 border border-acid bg-acid px-6 py-4 text-obsidian transition-colors duration-300 hover:bg-bone hover:border-bone"
@@ -135,30 +163,6 @@ export default async function ProductPage({ params }: ProductPageProps) {
                   More {categoryLabel(product.category).toLowerCase()}
                 </Link>
               </div>
-            </div>
-
-            <div className="lg:col-span-5 lg:col-start-8">
-              <ConceptFigure
-                src={product.image}
-                alt={`Concept image for ${product.name}: ${product.tagline}`}
-                ratio="4 / 5"
-                sizes="(min-width: 1024px) 38vw, 92vw"
-                priority
-              />
-
-              {product.gallery.length > 1 ? (
-                <div className="mt-6 grid grid-cols-2 gap-6">
-                  {product.gallery.slice(1).map((image) => (
-                    <ConceptFigure
-                      key={image}
-                      src={image}
-                      alt={`Additional concept frame for ${product.name}`}
-                      ratio="1 / 1"
-                      sizes="(min-width: 1024px) 19vw, 44vw"
-                    />
-                  ))}
-                </div>
-              ) : null}
             </div>
           </div>
 

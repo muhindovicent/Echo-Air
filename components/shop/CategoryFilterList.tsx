@@ -16,6 +16,12 @@ type CategoryFilterListProps = {
   idPrefix: string;
   /** Stacked list in the desktop sidebar, chips in the mobile panel. */
   layout?: "stacked" | "chips";
+  /**
+   * Surface the control sits on. The mobile filter panel is off-white, so the
+   * light tone uses obsidian text instead of the bone text used on the dark
+   * pages.
+   */
+  tone?: "dark" | "light";
 };
 
 /**
@@ -29,6 +35,7 @@ export function CategoryFilterList({
   onChange,
   idPrefix,
   layout = "stacked",
+  tone = "dark",
 }: CategoryFilterListProps) {
   return (
     <ul
@@ -50,15 +57,25 @@ export function CategoryFilterList({
                 "group flex w-full items-center justify-between gap-4 border px-4 py-3 text-left transition-colors duration-300",
                 layout === "chips" && "w-auto",
                 selected
-                  ? "border-acid bg-acid text-obsidian"
-                  : "border-bone/15 text-bone/75 hover:border-bone/40 hover:text-bone",
+                  ? tone === "light"
+                    ? "border-obsidian bg-obsidian text-bone"
+                    : "border-acid bg-acid text-obsidian"
+                  : tone === "light"
+                    ? "border-obsidian/25 text-ink hover:border-obsidian hover:text-obsidian"
+                    : "border-bone/15 text-bone/75 hover:border-bone/40 hover:text-bone",
               )}
             >
               <span className="text-[0.95rem]">{item.label}</span>
               <span
                 className={cn(
                   "label",
-                  selected ? "text-obsidian/70" : "text-ash",
+                  selected
+                    ? tone === "light"
+                      ? "text-bone-dim"
+                      : "text-obsidian/70"
+                    : tone === "light"
+                      ? "text-ink-soft"
+                      : "text-ash",
                 )}
               >
                 {item.count}

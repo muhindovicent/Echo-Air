@@ -5,6 +5,12 @@ provenance). The site ships the cropped, graded-ready versions in
 `public/concept`.
 
 Run from the repo root:  python tools/crop_concept_assets.py
+
+After changing the crops, clear the Next.js image optimiser cache — it is
+keyed by URL, not by file content, so it keeps serving the previous crop:
+
+    rm -rf .next/cache/images    # macOS / Linux
+    Remove-Item -Recurse -Force .next\\cache\\images   # Windows
 """
 
 from pathlib import Path
@@ -24,7 +30,7 @@ CROPS = [
     ("denim.jpg", "look-03.jpg", (0.48, 0.45, 1.00, 1.00)),         # black denim only
     ("denim.jpg", "piece-denim.jpg", (0.00, 0.55, 0.32, 1.00)),     # light indigo denim
     ("jacket.jpg", "look-04.jpg", (0.00, 0.52, 0.62, 1.00)),        # leather folds
-    ("jacket.jpg", "piece-outerwear.jpg", (0.00, 0.32, 0.38, 0.80)),# leather + zip, no label
+    ("jacket.jpg", "piece-outerwear.jpg", (0.00, 0.44, 0.36, 0.92)),# leather + zip, label cropped out
     ("runner.jpg", "piece-runner.jpg", (0.00, 0.42, 0.55, 1.00)),   # toe + sole
     ("tee.jpg", "studio.jpg", (0.18, 0.00, 0.82, 0.72)),            # torso crop
     ("look-04.jpg", "hero.jpg", (0.00, 0.00, 1.00, 1.00)),          # full-length silhouette

@@ -11,21 +11,32 @@ const FOCUSABLE = [
   '[tabindex]:not([tabindex="-1"])',
 ].join(", ");
 
+type ModalDialogOptions = {
+  /** Element that receives focus when the dialog opens. */
+  initialFocusRef?: RefObject<HTMLElement | null>;
+  /** Element that receives focus again when the dialog closes. */
+  returnFocusRef?: RefObject<HTMLElement | null>;
+};
+
 /**
  * Shared behaviour for the modal surfaces (mobile navigation, mobile filter
  * panel): moves focus into the panel, keeps `Tab` inside it, closes on
- * `Escape`, locks background scrolling and restores focus on close.
+ * `Escape`, locks background scrolling and restores focus to the control that
+ * opened the dialog when it closes.
  */
 export function useModalDialog(
   open: boolean,
   onClose: () => void,
   panelRef: RefObject<HTMLElement | null>,
-  initialFocusRef?: RefObject<HTMLElement | null>,
+  { initialFocusRef, returnFocusRef }: ModalDialogOptions = {},
 ) {
   useEffect(() => {
     if (!open) return;
 
     const previouslyFocused = document.activeElement as HTMLElement | null;
+    // Captured while the dialog is open so the cleanup restores focus to the
+    // element that is still mounted at that point.
+    const returnTarget = returnFocusRef?.current ?? null;
     const { body } = document;
     const previousOverflow = body.style.overflow;
     body.style.overflow = "hidden";
@@ -66,7 +77,16 @@ export function useModalDialog(
     return () => {
       document.removeEventListener("keydown", onKeyDown);
       body.style.overflow = previousOverflow;
-      previouslyFocused?.focus?.();
+
+      // Give focus back to the control that opened the dialog. Falling back
+      // to the previously focused element keeps the behaviour correct when
+      // the opener is not known.
+      const target = returnTarget ?? previouslyFocused;
+      if (target && document.contains(target)) {
+        target.focus();
+      } else {
+        previouslyFocused?.focus?.();
+      }
     };
-  }, [open, onClose, panelRef, initialFocusRef]);
+  }, [open, onClose, panelRef, initialFocusRef, returnFocusRef]);
 }

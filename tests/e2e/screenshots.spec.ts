@@ -108,4 +108,20 @@ test.describe("review screenshots", () => {
       await expect(page.getByRole("heading", { level: 1 })).toBeVisible();
     });
   }
+
+  test("captures the open mobile filter panel", async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto("/shop");
+
+    await page.getByRole("button", { name: /^filters$/i }).click();
+    await expect(
+      page.getByRole("dialog", { name: "Catalogue filters" }),
+    ).toBeVisible();
+
+    await page.screenshot({
+      path: path.join(OUT, "filter-panel-375.jpg"),
+      type: "jpeg",
+      quality: 78,
+    });
+  });
 });

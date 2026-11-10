@@ -21,7 +21,7 @@ export function SiteHeader() {
 
   const closeMenu = useCallback(() => setMenuOpen(false), []);
 
-  useModalDialog(menuOpen, closeMenu, panelRef);
+  useModalDialog(menuOpen, closeMenu, panelRef, { returnFocusRef: toggleRef });
 
   return (
     <header className="fixed inset-x-0 top-0 z-50">

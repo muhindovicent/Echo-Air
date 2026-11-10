@@ -13,6 +13,9 @@
   --color-bone: #f5f5f0;
   --color-bone-dim: #cbcabf;
   --color-ash: #8a919b;
+  /* Ink tones for the off-white surfaces (mobile filter panel). */
+  --color-ink: #3b4046;
+  --color-ink-soft: #5b6169;
 
   /* Accent */
   --color-acid: #c9f64a;

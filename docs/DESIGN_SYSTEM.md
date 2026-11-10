@@ -20,11 +20,19 @@ neon glow, no generic card grid.
 | `--color-bone`   | `#F5F5F0`  | Primary text, rules, mobile menu surface        |
 | `--color-bone-dim` | `#CBCABF` | Secondary text                                 |
 | `--color-ash`    | `#8A919B`  | Tertiary text, meta labels                      |
+| `--color-ink`    | `#3B4046`  | Primary text on off-white surfaces (filter panel) |
+| `--color-ink-soft` | `#5B6169` | Secondary text on off-white surfaces          |
 | `--color-acid`   | `#C9F64A`  | Single accent: active states, markers, one band  |
 
 Contrast: body text is `#F5F5F0` on `#0B0D10` (~17:1). The acid accent is
 used for small text on obsidian only where it clears 4.5:1, and as a surface
 behind obsidian text (not as text on bone).
+
+**Light surfaces.** The mobile filter panel sits on the off-white surface, so
+components used there take a `tone="light"` variant that swaps the bone text
+for the opaque `--color-ink` tones. Transparent text colours are avoided there
+so the contrast does not depend on alpha compositing; the Playwright suite
+asserts every control in the panel clears 4.5:1 against the panel background.
 
 ## 3. Typography
 
@@ -84,6 +92,20 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
 - Every card links to a real preview route; there are no placeholder hrefs.
 - Filtering lives in the browser so `/shop` stays statically prerendered, and
   the active state is mirrored into the query string for shareable views.
+- Small screens get a condensed introduction: the catalogue heading, one short
+  line of context and the search field all sit in the first viewport, and the
+  full disclaimer paragraph is shown from `md` up (the footer keeps the full
+  disclosure at every size).
+- On a product page the main frame follows the title and description on small
+  screens and moves to the right-hand column from `lg` up, so the construction
+  notes never push the imagery below the fold.
+
+### Dialogs
+
+`useModalDialog` implements one contract for every modal surface: focus moves
+into the panel, `Tab` is trapped, `Escape` closes, the background scroll is
+locked, and focus is returned to the control that opened the dialog (the
+menu button, the Filters button) rather than to whatever was focused before.
 
 ## 6. Imagery rules
 

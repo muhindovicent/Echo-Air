@@ -24,7 +24,7 @@ export function SortControl({
     <div>
       <label
         htmlFor={id}
-        className={cn("label", tone === "light" ? "text-obsidian/60" : "text-ash")}
+        className={cn("label", tone === "light" ? "text-ink-soft" : "text-ash")}
       >
         Sort by
       </label>
