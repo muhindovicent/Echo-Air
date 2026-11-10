@@ -34,12 +34,52 @@ The repository has seven root-level source/configuration files: `index.html`, `E
 
 ## Phase 2 — brand and reusable UI foundation
 
-- Establish a two-font design system, warm cream and near-black surfaces, restrained red-orange accents.
-- Document spacing, typography, contrast, components, and responsive rules.
-- Choose one homepage composition; do not maintain both legacy versions.
-- Implement accessible header, navigation, announcement bar, footer, buttons, and product-card shell.
+**Delivered in `feat/phase-01-nextjs-foundation`** (homepage + frontend
+foundation):
 
-**Exit criteria:** one coherent brand design and working responsive navigation, verified at mobile and desktop widths.
+- [x] Replace the static prototype with a Next.js App Router project
+      (TypeScript, Tailwind CSS v4) at the repository root; the original files
+      are preserved in `legacy/`.
+- [x] Establish the visual direction: obsidian `#0B0D10`, off-white `#F5F5F0`,
+      acid-green `#C9F64A`, Space Grotesk + IBM Plex Mono, cinematic lighting,
+      oversized editorial type, restrained motion.
+- [x] Document spacing, typography, contrast, components, motion and
+      responsive rules in [DESIGN_SYSTEM.md](DESIGN_SYSTEM.md).
+- [x] Build one canonical homepage (the two legacy homepages are retired to
+      `legacy/`).
+- [x] Implement an accessible header, responsive navigation with a working
+      mobile menu, footer, buttons and a fixed-ratio image frame component.
+- [x] Keep every placeholder frame labelled as a concept asset and remove all
+      dead navigation targets from the new build.
+
+**Decisions taken in this phase**
+
+- *Palette.* The earlier note proposed warm cream and near-black with a
+  red-orange accent. That palette was inherited from the legacy `index.html`,
+  so reusing it would have made the rebuild read as a restyle. The direction
+  is now obsidian / off-white / acid-green with a monochrome + acid duotone
+  grade applied to all placeholder imagery.
+- *Imagery.* No real brand photography exists yet. The legacy stock frames
+  are kept in `assets/concept-source/`, cropped into `public/concept/` by
+  `tools/crop_concept_assets.py` (crops remove the third-party marks visible
+  in the raw stock) and tagged "Concept" on screen.
+- *Navigation.* With no catalog pages yet, the primary navigation points at
+  homepage sections instead of shipping links to routes that do not exist.
+- *Commerce.* Still out of scope. No cart, checkout, payment form, stock
+  level, price or review is presented anywhere in this build.
+
+**Still open**
+
+- [ ] Confirm real product categories, target customers, pricing/currency,
+      delivery coverage, brand assets, and whether live checkout is needed.
+- [ ] Capture baseline desktop/mobile screenshots and browser console errors
+      on developer's local machine.
+- [ ] Decide: Shopify theme for fastest business launch or custom
+      Next.js + Shopify for engineering control.
+
+**Exit criteria (met):** one coherent brand direction, working responsive
+navigation, no dead primary navigation, a documented design system and a
+green lint/typecheck/production build.
 
 ## Phase 3 — catalog and product discovery
 

@@ -1,43 +1,99 @@
 # Echo & Air
 
-A clothing-brand website currently in prototype form. This repository is undergoing an incremental redesign toward a responsive, accessible storefront with a complete product-to-checkout experience.
+Phase 01 of the Echo & Air storefront rebuild: a Next.js (App Router) +
+TypeScript + Tailwind CSS frontend foundation and a new homepage.
 
-## Current repository state (Phase 1 baseline)
+**Status: concept build.** No catalog, cart, checkout, account or backend
+exists yet, and nothing on the site can be ordered. Every photograph is
+placeholder art carried over from the legacy prototype and tagged "Concept" on
+screen.
 
-The original project is a **static HTML/CSS prototype**, not yet a functioning e-commerce application.
+## Stack
 
-- `index.html` is the main standalone landing page with inline styles.
-- `Echo and Air.html` is an alternative homepage, with styles from `echo and air.css`.
-- `shop.html`, `drop.html`, and `about.html` use the alternative design.
-- The alternative pages reference `js/data.js` and `js/main.js`, but these scripts are absent from the checked-in repository.
-- Several existing navigation links reference missing pages (including `drops.html` and `wishlist.html`).
-- There is no product checkout, order backend, or configured commerce service.
+- Next.js 16 (App Router, Turbopack, static prerender)
+- React 19, TypeScript (strict)
+- Tailwind CSS v4 (CSS-first tokens in `app/globals.css`)
+- `next/font` — Space Grotesk + IBM Plex Mono, self-hosted
 
-**Do not interpret visible product cards or checkout-style elements as real transactions.** The legacy source is retained so it can be reviewed while a replacement is built.
+## Getting started
 
-## View the existing site locally
+```bash
+npm install
+npm run dev      # http://localhost:3000
+```
 
-No `npm install` is needed for the current static source.
+Other scripts:
 
-1. Open the project folder in VS Code.
-2. Run a local HTTP server from the project root:
-   - Windows with Python: `py -m http.server 5500`
-   - macOS/Linux with Python: `python3 -m http.server 5500`
-3. Open `http://localhost:5500/index.html` in your browser.
+```bash
+npm run build      # production build (static prerender)
+npm run start      # serve the production build
+npm run lint       # ESLint (eslint-config-next, flat config)
+npm run typecheck  # tsc --noEmit
+```
 
-The standalone landing page is expected to load, but its commerce controls are largely placeholders. The alternate pages may show missing-resource errors in the browser console. No complete browser test of the site has been recorded.
+Node 20.9+ is required by Next.js 16.
 
-## Redesign workflow
+## Project structure
 
-See [the phased roadmap](docs/REDESIGN_ROADMAP.md).
+```
+app/                  App Router entry points
+  layout.tsx          Fonts, metadata, header/footer shell, skip link
+  page.tsx            Homepage composition
+  globals.css         Design tokens, base layer, motion rules
+  icon.svg            Favicon
+components/
+  chrome/             SiteHeader (incl. mobile menu), SiteFooter
+  sections/           Hero, NewArrivals, Lookbook, BrandStory, ClosingBand
+  ui/                 ActionLink, ConceptFigure, Reveal
+lib/
+  content.ts          Typed editorial content + concept image map
+  cn.ts               Class-name joiner
+docs/                 Roadmap and design system documentation
+assets/concept-source/ Untouched legacy frames (provenance)
+public/concept/       Cropped, site-ready concept frames
+tools/                crop_concept_assets.py (reproducible crop step)
+legacy/               The original static prototype, preserved verbatim
+```
 
-Development must happen on a separate branch with a pull request; keep `main` as the baseline until changes are reviewed. Phase 1 only corrects repository hygiene and documents the migration: **no HTML/CSS redesign is being claimed yet**.
+## Concept assets
 
-## Proposed stack (pending business confirmation)
+The legacy site hot-linked stock photography. Those frames are kept for
+provenance in `assets/concept-source/` and cropped into `public/concept/` by
+`tools/crop_concept_assets.py` (needs Python + Pillow). The crops remove the
+third-party marks visible in the raw stock, and the site applies a single
+monochrome + acid-green duotone so the placeholders read as one campaign.
 
-- Next.js + TypeScript for a custom storefront
-- Responsive styles and shared design tokens
-- Shopify for products, variants, cart, inventory, and hosted checkout if the business will sell online
-- Automated accessibility and end-to-end tests before production launch
+```bash
+python -m pip install pillow
+python tools/crop_concept_assets.py
+```
 
-A simpler Shopify Online Store theme is also a valid alternative if rapid business launch is more important than a bespoke custom frontend. Do not create a home-built payment-card form.
+Real brand photography replaces these in a later phase; see
+[docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md).
+
+## Legacy prototype
+
+`legacy/` holds the original static site (`index.html`, `Echo and Air.html`,
+`shop.html`, `drop.html`, `about.html`, `echo and air.css`) exactly as it was,
+so it can still be reviewed while the replacement is verified. It references
+missing scripts (`js/data.js`, `js/main.js`) and several dead links, and none
+of its commerce controls are real.
+
+To view it: serve the `legacy/` folder over HTTP, e.g.
+`py -m http.server 5500` from inside `legacy/`.
+
+## Documentation
+
+- [docs/DESIGN_SYSTEM.md](docs/DESIGN_SYSTEM.md) — tokens, type, components,
+  motion, accessibility and responsive rules
+- [docs/REDESIGN_ROADMAP.md](docs/REDESIGN_ROADMAP.md) — phased plan and exit
+  criteria
+
+## Scope of this phase
+
+Implemented: design system, homepage (hero, new arrivals preview, lookbook,
+brand story, closing band), responsive header with working mobile menu,
+footer, accessibility and reduced-motion support.
+
+Not implemented (later phases): product catalog and detail pages, search and
+filtering, cart, checkout, authentication, inventory, payments, analytics.
