@@ -144,6 +144,33 @@ green lint/typecheck/production build.
   no price, no availability, no stock level and no ordering path anywhere in
   the build.
 
+## Phase 4A — functional demonstration shopping bag
+
+**Delivered in `feat/phase-04-shopping-bag`** (frontend interactions only):
+
+- [x] A typed bag model (`lib/bag.ts`) storing only the product slug, the
+      selected demonstration size, the colourway id and a quantity, validated
+      against the current catalogue on read and merged by selection.
+- [x] A bag store separate from the wishlist, kept in React state, mirrored to
+      `localStorage`, hydrated through `useSyncExternalStore` and
+      synchronised across tabs.
+- [x] An **Add to Demo Bag** action wired to the existing size and colour
+      selectors, with visible pending feedback and a live confirmation.
+- [x] A responsive bag drawer and a `/bag` page with frames, selections,
+      quantity increase/decrease, removal, clear-all and designed empty states.
+- [x] A bag button with an item count in the desktop header and the mobile
+      menu.
+- [x] Keyboard-accessible drawer (focus moved in, focus trapped, `Escape`
+      closes, focus returned to the button that opened it) and reduced-motion
+      support through the existing motion rules.
+- [x] No prices, totals, stock, delivery, checkout or payment: the bag is
+      labelled as a demonstration and the tests assert it.
+
+**Still open**
+
+- [ ] A real product source, priced variants and stock-aware behaviour.
+- [ ] A priced cart, hosted checkout and payments (Phase 4B).
+
 ## Phase 4 — commerce integration
 
 - Connect the selected provider (recommended: Shopify if live online sales are required).

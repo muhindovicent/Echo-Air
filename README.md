@@ -1,8 +1,8 @@
 # Echo & Air
 
-Phase 03 of the Echo & Air storefront rebuild: a Next.js (App Router) +
-TypeScript + Tailwind CSS frontend with a working demonstration catalogue and
-product experience.
+Phase 04 of the Echo & Air storefront rebuild: a Next.js (App Router) +
+TypeScript + Tailwind CSS frontend with a working demonstration catalogue,
+product experience and a demonstration shopping bag.
 
 **Status: concept build.** No catalog data source, cart, checkout, account or
 backend exists yet, and nothing on the site can be ordered. Every photograph
@@ -68,7 +68,8 @@ guide dialog, wishlist persistence and the responsive product layout).
 | --- | --- |
 | `/` | Homepage: hero, new-arrivals preview, lookbook, brand story, closing band |
 | `/shop` | Demonstration catalogue with search, category filter, sorting and active-filter indicators |
-| `/shop/[slug]` | Product preview: interactive gallery, demonstration size/colourway selectors, size guide and wishlist action (12 static paths) |
+| `/shop/[slug]` | Product preview: interactive gallery, demonstration size/colourway selectors, size guide, wishlist and demo-bag actions (12 static paths) |
+| `/bag` | The demonstration bag: the pieces you picked, with quantity and removal controls |
 | `/wishlist` | Pieces saved on this device (React state + `localStorage`) |
 | `*` | Designed 404 page |
 
@@ -111,29 +112,54 @@ be shared, and it is read back on load.
   shows the count, `/wishlist` lists the saved pieces, and both empty states
   are designed. Nothing is reserved or ordered.
 
+## Demonstration bag
+
+- `lib/bag.ts` holds the typed model: a `BagEntry` stores only the product
+  slug, the selected demonstration size, the colourway id and a quantity.
+  Entries are validated against the current catalogue on read — unknown
+  pieces, unknown sizes and unknown colourways are dropped, quantities are
+  clamped, and entries describing the same selection are merged into one line.
+- `BagProvider` keeps the bag in React state, mirrored to `localStorage` and
+  read back through `useSyncExternalStore`, so it survives a reload without a
+  hydration mismatch. It is a **separate store** from the wishlist and
+  synchronises across tabs through the `storage` event.
+- The **Add to Demo Bag** button next to the size and colour selectors adds
+  the current selection with a short visible pending state, and confirms the
+  result in a live region.
+- The bag appears as a drawer (opened from the header bag button) and as the
+  `/bag` page. Both list the frames, the selected size and colour label, and
+  offer quantity increase/decrease, removal, clear-all and a designed empty
+  state.
+- The bag is explicitly a demonstration: there is no price, total, stock,
+  delivery, checkout or payment anywhere in it, and the tests assert that.
+
 ## Project structure
 
 ```
 app/                  App Router entry points
-  layout.tsx          Fonts, metadata, header/footer shell, skip link, wishlist provider
+  layout.tsx          Fonts, metadata, header/footer shell, skip link,
+                      wishlist + bag providers
   page.tsx            Homepage composition
   globals.css         Design tokens, base layer, motion rules
   icon.svg            Favicon
   not-found.tsx       Designed 404 page
   shop/page.tsx       Catalogue page
   shop/[slug]/page.tsx Product preview route (12 static paths)
+  bag/page.tsx        Demonstration bag
   wishlist/page.tsx   Saved pieces
 components/
-  chrome/             SiteHeader (incl. mobile menu, wishlist count), SiteFooter
+  chrome/             SiteHeader (incl. mobile menu, wishlist + bag counts), SiteFooter
   sections/           Hero, NewArrivals, Lookbook, BrandStory, ClosingBand
   shop/               ShopBrowser, ProductCard, ProductGallery, ProductOptions,
                       OptionGroup, SizeGuideDialog, WishlistButton,
-                      WishlistGrid, WishlistProvider, CategoryFilterList,
+                      WishlistGrid, WishlistProvider, BagProvider, BagDrawer,
+                      BagLineItem, AddToBagButton, CategoryFilterList,
                       SortControl, FilterPanel
   ui/                 ActionLink, ConceptFigure, Reveal, useModalDialog
 lib/
   content.ts          Typed editorial content + concept image map
   products.ts         Typed demonstration catalogue and helpers
+  bag.ts              Typed demonstration bag model and helpers
   cn.ts               Class-name joiner
 tests/e2e/            Playwright smoke tests
 docs/                 Roadmap, design system and review screenshots
@@ -188,8 +214,10 @@ functional demonstration catalogue (`/shop`) with search, category filtering,
 sorting, active-filter indicators, empty states, a mobile filter panel,
 product preview routes, an interactive product gallery with zoom and keyboard
 controls, demonstration size and colourway selectors, a demonstration size
-guide dialog and a wishlist persisted in `localStorage`.
+guide dialog, a wishlist persisted in `localStorage` and a demonstration
+shopping bag with a drawer, a `/bag` page, quantity controls and a header
+count.
 
 Not implemented (later phases): a real product data source, product
-configuration (sizes, variants, availability), cart, checkout, authentication,
-inventory, payments, analytics.
+configuration (sizes, variants, availability), a priced cart, checkout,
+authentication, inventory, payments, analytics.

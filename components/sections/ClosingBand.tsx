@@ -6,7 +6,7 @@ export function ClosingBand() {
     <section aria-labelledby="closing-heading" className="bg-acid text-obsidian">
       <div className="mx-auto max-w-[1600px] px-5 py-16 md:px-10 md:py-24">
         <Reveal>
-          <p className="label text-obsidian/60">Phase 03 — Product experience</p>
+          <p className="label text-obsidian/60">Phase 04 — Demo bag</p>
           <h2
             id="closing-heading"
             className="mt-6 text-[clamp(2rem,6vw,5rem)] font-medium uppercase leading-[0.92] tracking-[-0.035em]"

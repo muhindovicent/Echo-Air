@@ -60,7 +60,7 @@ export function SiteFooter() {
         <div className="mt-16 border border-bone/12 bg-obsidian p-6 md:mt-24 md:p-8">
           <p className="label text-acid">Concept disclosure</p>
           <p className="mt-4 max-w-3xl text-[0.95rem] leading-relaxed text-bone/70">
-            This is a Phase 03 concept build, not a live store. Every
+            This is a Phase 04 concept build, not a live store. Every
             photograph on this site is placeholder artwork carried over from the
             original prototype and tagged &ldquo;Concept&rdquo; on screen. Garment
             names are working titles for layout purposes, and the size and
@@ -75,7 +75,7 @@ export function SiteFooter() {
 
         <div className="mt-10 flex flex-col gap-5 border-t border-bone/12 pt-8 sm:flex-row sm:items-center sm:justify-between">
           <p className="label text-ash">
-            &copy; {copyrightYear} Echo &amp; Air — Phase 03 product experience
+            &copy; {copyrightYear} Echo &amp; Air — Phase 04 demo bag
           </p>
           <Link
             href="/#top"
