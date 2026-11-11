@@ -56,7 +56,7 @@ export const navItems: NavItem[] = [
  * them.
  */
 export const heroMeta: { label: string; value: string }[] = [
-  { label: "Build", value: "Phase 01 — concept" },
+  { label: "Build", value: "Phase 03 — concept" },
   { label: "Release", value: "Drop 01 — preview" },
   { label: "Status", value: "Not on sale, no checkout" },
   { label: "Scroll", value: "01 — New arrivals" },
@@ -217,6 +217,7 @@ export const footerColumns: { title: string; links: NavItem[] }[] = [
     title: "Navigate",
     links: [
       { label: "Shop", href: "/shop" },
+      { label: "Wishlist", href: "/wishlist" },
       { label: "New Arrivals", href: "/#new-arrivals" },
       { label: "Lookbook", href: "/#lookbook" },
       { label: "Studio", href: "/#studio" },

@@ -1,14 +1,16 @@
 # Echo & Air
 
-Phase 02 of the Echo & Air storefront rebuild: a Next.js (App Router) +
-TypeScript + Tailwind CSS frontend with a working demonstration catalogue.
+Phase 03 of the Echo & Air storefront rebuild: a Next.js (App Router) +
+TypeScript + Tailwind CSS frontend with a working demonstration catalogue and
+product experience.
 
 **Status: concept build.** No catalog data source, cart, checkout, account or
 backend exists yet, and nothing on the site can be ordered. Every photograph
 is placeholder art carried over from the legacy prototype and tagged "Concept"
-on screen. Garment names are working titles. No contact details, address,
-social accounts, pricing, stock levels or reviews are published, because none
-have been confirmed by the business.
+on screen. Garment names are working titles. Sizes and colourways are
+demonstration variants — no stock levels, availability, pricing, reviews or
+confirmed contact details are published, because none have been confirmed by
+the business.
 
 ## Stack
 
@@ -52,10 +54,13 @@ The suite covers homepage rendering and landmarks, dead-link detection,
 navigation anchors, responsive layout and horizontal overflow at 375 / 768 /
 1440 / 1920 px, the mobile menu (focus move, focus trap, Escape, scroll lock),
 image loading, skip link, heading order, focus visibility and
-`prefers-reduced-motion`, plus the catalogue (search, category filter, sort,
+`prefers-reduced-motion`, the catalogue (search, category filter, sort,
 active-filter indicators, empty state, product preview routes and the mobile
-filter panel). `tests/e2e/screenshots.spec.ts` also regenerates the review
-captures in `docs/screenshots/`.
+filter panel) and the product experience (gallery switching, keyboard
+navigation, zoom, single-frame products, demonstration selectors, the size
+guide dialog, wishlist persistence and the responsive product layout).
+`tests/e2e/screenshots.spec.ts` also regenerates the review captures in
+`docs/screenshots/`.
 
 ## Routes
 
@@ -63,7 +68,8 @@ captures in `docs/screenshots/`.
 | --- | --- |
 | `/` | Homepage: hero, new-arrivals preview, lookbook, brand story, closing band |
 | `/shop` | Demonstration catalogue with search, category filter, sorting and active-filter indicators |
-| `/shop/[slug]` | Product preview page for one demonstration piece (12 static paths) |
+| `/shop/[slug]` | Product preview: interactive gallery, demonstration size/colourway selectors, size guide and wishlist action (12 static paths) |
+| `/wishlist` | Pieces saved on this device (React state + `localStorage`) |
 | `*` | Designed 404 page |
 
 ## Catalogue data
@@ -75,26 +81,54 @@ stock state, size availability, review or purchase option, and `isConcept` /
 `availability` are typed as constants so that omission is enforced by the
 type system rather than by convention.
 
+Each product lists `views`: frames that always come from the **same** source
+photograph, so a gallery never presents an unrelated picture as another view
+of the same garment. Products with a single frame render without a thumbnail
+rail or frame navigation.
+
 Filtering, sorting and searching happen in the browser against that static
 list, so `/shop` stays a prerendered static route. The current filter state is
 mirrored into the query string (`/shop?q=tee&category=jersey`) so a view can
 be shared, and it is read back on load.
 
+## Product experience
+
+- **Gallery** — thumbnails switch the frame, the stage responds to
+  `ArrowLeft`/`ArrowRight`, and a "Full screen" action opens the complete
+  frame. The full-screen view shows the image with `object-contain` at its own
+  pixel size, so it is never stretched into pixelation and never cropped; a
+  zoom control only appears when the source resolution can support it, and
+  `Escape` closes the view and returns focus to the button that opened it.
+- **Variant selectors** — `OptionGroup` is a reusable radio group built on real
+  radio inputs, used for the demonstration sizes and colourway labels. The
+  colourway group states that selecting a label does not change the product
+  photography and that the options are not product variants.
+- **Size guide** — a dialog that shows the structure of a size guide with
+  every measurement marked "Not published"; no garment measurements are
+  invented.
+- **Wishlist** — `WishlistProvider` keeps saved slugs in React state and
+  mirrors them to `localStorage`, so the list survives a reload. The header
+  shows the count, `/wishlist` lists the saved pieces, and both empty states
+  are designed. Nothing is reserved or ordered.
+
 ## Project structure
 
 ```
 app/                  App Router entry points
-  layout.tsx          Fonts, metadata, header/footer shell, skip link
+  layout.tsx          Fonts, metadata, header/footer shell, skip link, wishlist provider
   page.tsx            Homepage composition
   globals.css         Design tokens, base layer, motion rules
   icon.svg            Favicon
   not-found.tsx       Designed 404 page
   shop/page.tsx       Catalogue page
   shop/[slug]/page.tsx Product preview route (12 static paths)
+  wishlist/page.tsx   Saved pieces
 components/
-  chrome/             SiteHeader (incl. mobile menu), SiteFooter
+  chrome/             SiteHeader (incl. mobile menu, wishlist count), SiteFooter
   sections/           Hero, NewArrivals, Lookbook, BrandStory, ClosingBand
-  shop/               ShopBrowser, ProductCard, CategoryFilterList,
+  shop/               ShopBrowser, ProductCard, ProductGallery, ProductOptions,
+                      OptionGroup, SizeGuideDialog, WishlistButton,
+                      WishlistGrid, WishlistProvider, CategoryFilterList,
                       SortControl, FilterPanel
   ui/                 ActionLink, ConceptFigure, Reveal, useModalDialog
 lib/
@@ -149,10 +183,12 @@ To view it: serve the `legacy/` folder over HTTP, e.g.
 
 Implemented: design system, homepage (hero, new arrivals preview, lookbook,
 brand story, closing band), responsive header with working mobile menu,
-footer, accessibility and reduced-motion support, Playwright smoke tests, and
-a functional demonstration catalogue (`/shop`) with search, category
-filtering, sorting, active-filter indicators, empty states, a mobile filter
-panel and product preview routes.
+footer, accessibility and reduced-motion support, Playwright smoke tests, a
+functional demonstration catalogue (`/shop`) with search, category filtering,
+sorting, active-filter indicators, empty states, a mobile filter panel,
+product preview routes, an interactive product gallery with zoom and keyboard
+controls, demonstration size and colourway selectors, a demonstration size
+guide dialog and a wishlist persisted in `localStorage`.
 
 Not implemented (later phases): a real product data source, product
 configuration (sizes, variants, availability), cart, checkout, authentication,

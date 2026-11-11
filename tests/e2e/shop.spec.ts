@@ -480,33 +480,33 @@ test.describe("product page hierarchy", () => {
     await page.setViewportSize({ width: 375, height: 812 });
     await page.goto("/shop/longform-overcoat");
 
-    const figure = page.locator("main figure").first();
+    const stage = page.getByTestId("gallery-stage");
     const notes = page.getByText("Construction notes");
 
-    await expect(figure).toBeVisible();
+    await expect(stage).toBeVisible();
     await expect(notes).toBeAttached();
 
-    const figureBox = await figure.boundingBox();
+    const stageBox = await stage.boundingBox();
     const notesBox = await notes.boundingBox();
 
-    expect(figureBox).not.toBeNull();
+    expect(stageBox).not.toBeNull();
     expect(notesBox).not.toBeNull();
-    expect(figureBox!.y).toBeLessThan(notesBox!.y);
+    expect(stageBox!.y).toBeLessThan(notesBox!.y);
   });
 
   test("keeps the image in the right column on desktop", async ({ page }) => {
     await page.setViewportSize({ width: 1440, height: 900 });
     await page.goto("/shop/longform-overcoat");
 
-    const figure = page.locator("main figure").first();
+    const stage = page.getByTestId("gallery-stage");
     const heading = page.getByRole("heading", { level: 1 });
 
-    const figureBox = await figure.boundingBox();
+    const stageBox = await stage.boundingBox();
     const headingBox = await heading.boundingBox();
 
-    expect(figureBox).not.toBeNull();
+    expect(stageBox).not.toBeNull();
     expect(headingBox).not.toBeNull();
-    expect(figureBox!.x).toBeGreaterThan(headingBox!.x);
+    expect(stageBox!.x).toBeGreaterThan(headingBox!.x);
   });
 });
 

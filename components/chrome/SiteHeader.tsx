@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModalDialog } from "@/components/ui/useModalDialog";
+import { useWishlist } from "@/components/shop/WishlistProvider";
 import { cn } from "@/lib/cn";
 import { navItems } from "@/lib/content";
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { count: wishlistCount } = useWishlist();
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -71,7 +73,27 @@ export function SiteHeader() {
           </nav>
 
           <div className="flex items-center gap-4">
-            <span className="label hidden text-ash xl:block">Phase 01</span>
+            <Link
+              href="/wishlist"
+              data-testid="wishlist-link"
+              aria-label={
+                wishlistCount > 0
+                  ? `Wishlist, ${wishlistCount} ${wishlistCount === 1 ? "piece" : "pieces"} saved`
+                  : "Wishlist, empty"
+              }
+              className="label group relative hidden items-center gap-2 text-bone/85 transition-colors duration-300 hover:text-acid sm:flex"
+            >
+              Wishlist
+              {wishlistCount > 0 ? (
+                <span
+                  data-testid="wishlist-count"
+                  className="grid h-5 min-w-5 place-items-center bg-acid px-1 text-[0.65rem] font-medium text-obsidian"
+                >
+                  {wishlistCount}
+                </span>
+              ) : null}
+            </Link>
+            <span className="label hidden text-ash xl:block">Phase 03</span>
             <button
               ref={toggleRef}
               type="button"
@@ -142,14 +164,31 @@ export function SiteHeader() {
                   </Link>
                 </li>
               ))}
+              <li>
+                <Link
+                  href="/wishlist"
+                  onClick={closeMenu}
+                  className="flex items-baseline gap-5 text-[clamp(2.25rem,11vw,3.5rem)] font-medium leading-[1.05] tracking-[-0.03em] transition-colors duration-300 hover:text-obsidian/60"
+                >
+                  <span className="label text-obsidian/45">
+                    0{navItems.length + 1}
+                  </span>
+                  Wishlist
+                  {wishlistCount > 0 ? (
+                    <span className="label text-obsidian/45">
+                      ({wishlistCount})
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
             </ul>
 
             <div className="mt-14 border-t border-obsidian/15 pt-8">
-              <p className="label text-obsidian/50">Phase 01 — Concept preview</p>
+              <p className="label text-obsidian/50">Phase 03 — Product experience</p>
               <p className="mt-4 max-w-sm text-[0.95rem] leading-relaxed text-obsidian/70">
-                This build is a frontend foundation. The catalog, cart and
-                checkout are not live yet, so every image on the site is
-                placeholder art.
+                The catalogue, product previews and wishlist are working
+                demonstrations. There is no checkout and nothing can be ordered,
+                so every image on the site is placeholder art.
               </p>
             </div>
           </nav>

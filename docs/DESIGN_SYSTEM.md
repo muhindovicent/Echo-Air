@@ -1,4 +1,4 @@
-# Echo & Air — design system (Phase 01)
+# Echo & Air — design system
 
 The foundation for the Echo & Air storefront. Tokens live in `app/globals.css`
 (Tailwind v4 CSS-first theme), components in `components/`, editorial copy in
@@ -79,6 +79,13 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
 | `CategoryFilterList` | `components/shop/CategoryFilterList.tsx` | Toggle buttons with `aria-pressed`   |
 | `SortControl`        | `components/shop/SortControl.tsx`  | Native select, dark and light tones         |
 | `FilterPanel`        | `components/shop/FilterPanel.tsx`  | Mobile filter dialog                         |
+| `ProductGallery`     | `components/shop/ProductGallery.tsx` | Frames, thumbnails, zoom, keyboard control |
+| `ProductOptions`     | `components/shop/ProductOptions.tsx` | Demonstration size and colourway selection |
+| `OptionGroup`        | `components/shop/OptionGroup.tsx`  | Reusable radio group (real radio inputs)    |
+| `SizeGuideDialog`    | `components/shop/SizeGuideDialog.tsx` | Demonstration size guide dialog          |
+| `WishlistProvider`   | `components/shop/WishlistProvider.tsx` | Wishlist state backed by `localStorage`  |
+| `WishlistButton`     | `components/shop/WishlistButton.tsx` | Save/remove a piece                     |
+| `WishlistGrid`       | `components/shop/WishlistGrid.tsx` | Saved pieces and empty state               |
 | `ActionLink`         | `components/ui/ActionLink.tsx`     | Solid / ghost / quiet link variants          |
 | `ConceptFigure`      | `components/ui/ConceptFigure.tsx`  | Fixed-ratio frame, concept tag, duotone grade |
 | `Reveal`             | `components/ui/Reveal.tsx`         | Intersection-observer scroll reveal          |
@@ -100,12 +107,41 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
   screens and moves to the right-hand column from `lg` up, so the construction
   notes never push the imagery below the fold.
 
+### Product experience rules
+
+- **Views, not angles.** A product's frames are always crops of the same
+  source photograph. A gallery never shows an unrelated photograph as another
+  view of the same garment, and a single-frame product renders without a
+  thumbnail rail, a frame counter or frame navigation.
+- **Full screen, not upscaled.** The full-screen view shows the *complete*
+  frame with `object-contain`, sized to the source's own pixel dimensions and
+  never blown up, so low-resolution concept art is not stretched into
+  pixelation and nothing is cropped. When the source carries fewer pixels
+  than the area it is shown in, the view says so instead of pretending.
+- **Zoom only when it is real.** A zoom control appears only when the source
+  holds at least twice the pixels of the area it would be shown in; zooming
+  then pans with the arrow keys or a drag. Below that threshold the action is
+  labelled "Full screen" and no zoom is offered.
+- **Presentation.** The stage carries a soft key light from the upper left and
+  a deep vignette, the frame cross-fades on change, and the enlarged view
+  carries the same lighting treatment.
+- **Variant selectors** are radio groups built on real radio inputs
+  (`OptionGroup`), so keyboard behaviour and announcements come from the
+  platform. The legends read "demonstration only", and the colourway group
+  states explicitly that selecting a label does not change the product
+  photography and that the options are not product variants.
+- **Size guide** publishes no measurements: the table shows the structure a
+  live guide would use with every value marked "Not published".
+- **Wishlist** is device-local (`localStorage`), stores product slugs only,
+  and never implies a reservation, a stock hold or an order.
+
 ### Dialogs
 
 `useModalDialog` implements one contract for every modal surface: focus moves
 into the panel, `Tab` is trapped, `Escape` closes, the background scroll is
 locked, and focus is returned to the control that opened the dialog (the
-menu button, the Filters button) rather than to whatever was focused before.
+menu button, the Filters button, the zoom button, the size guide trigger)
+rather than to whatever was focused before.
 
 ## 6. Imagery rules
 
