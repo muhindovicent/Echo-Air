@@ -96,7 +96,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           </div>
 
           <div className="lg:col-span-6 lg:col-start-1 lg:row-start-2">
-            <div className="border border-bone/12 bg-obsidian-soft p-6">
+            <div className="border border-bone/12 bg-obsidian-soft p-5 md:p-6">
               <p className="label text-acid">Demonstration product</p>
               <p className="mt-3 text-[0.9rem] leading-relaxed text-bone/65">
                 This is a working title for a piece that does not exist yet.
@@ -105,11 +105,13 @@ export default async function ProductPage({ params }: ProductPageProps) {
               </p>
             </div>
 
-            <ProductOptions
-              slug={product.slug}
-              sizes={product.sizes}
-              colours={product.colours}
-            />
+            <div className="mt-8 md:mt-10">
+              <ProductOptions
+                slug={product.slug}
+                sizes={product.sizes}
+                colours={product.colours}
+              />
+            </div>
 
             <dl className="mt-10 border-t border-bone/12">
               <div className="border-b border-bone/12 py-5">

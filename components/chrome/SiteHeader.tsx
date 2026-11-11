@@ -93,7 +93,7 @@ export function SiteHeader() {
                 </span>
               ) : null}
             </Link>
-            <span className="label hidden text-ash xl:block">Phase 01</span>
+            <span className="label hidden text-ash xl:block">Phase 03</span>
             <button
               ref={toggleRef}
               type="button"
@@ -184,11 +184,11 @@ export function SiteHeader() {
             </ul>
 
             <div className="mt-14 border-t border-obsidian/15 pt-8">
-              <p className="label text-obsidian/50">Phase 01 — Concept preview</p>
+              <p className="label text-obsidian/50">Phase 03 — Product experience</p>
               <p className="mt-4 max-w-sm text-[0.95rem] leading-relaxed text-obsidian/70">
-                This build is a frontend foundation. The catalog, cart and
-                checkout are not live yet, so every image on the site is
-                placeholder art.
+                The catalogue, product previews and wishlist are working
+                demonstrations. There is no checkout and nothing can be ordered,
+                so every image on the site is placeholder art.
               </p>
             </div>
           </nav>

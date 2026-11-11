@@ -84,7 +84,15 @@ const FOOTWEAR_SIZES = ["40", "41", "42"] as const;
 const ONE_SIZE = ["One size"] as const;
 
 export const DEMONSTRATION_VARIANT_NOTE =
-  "Demonstration variants only — no sizes, colourways or stock levels are published.";
+  "Demonstration labels only — no size availability or stock levels are published.";
+
+/**
+ * Shown under the colourway selector. The labels are placeholders for the
+ * selector itself: choosing one does not change the product photography and
+ * the options are not product variants.
+ */
+export const COLOURWAY_VARIANT_NOTE =
+  "Demonstration labels only — selecting one does not change the product photography, and these are not product variants.";
 
 function sizesFor(category: ProductCategory): readonly string[] {
   switch (category) {

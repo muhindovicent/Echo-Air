@@ -20,7 +20,7 @@ The repository has seven root-level source/configuration files: `index.html`, `E
 5. Do not accept payments or publish checkout claims without a verified commerce provider.
 6. Build mobile-first, use semantic accessible controls, optimize images, and test each phase.
 
-## Phase 1 — foundation (current)
+## Phase 1 — foundation (complete)
 
 - [x] Create feature branch `redesign/phase-01-foundation`.
 - [x] Replace `gitignore` with working `.gitignore`.

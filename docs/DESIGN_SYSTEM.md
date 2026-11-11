@@ -1,4 +1,4 @@
-# Echo & Air — design system (Phase 01)
+# Echo & Air — design system
 
 The foundation for the Echo & Air storefront. Tokens live in `app/globals.css`
 (Tailwind v4 CSS-first theme), components in `components/`, editorial copy in
@@ -113,13 +113,23 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
   source photograph. A gallery never shows an unrelated photograph as another
   view of the same garment, and a single-frame product renders without a
   thumbnail rail, a frame counter or frame navigation.
+- **Full screen, not upscaled.** The full-screen view shows the *complete*
+  frame with `object-contain`, sized to the source's own pixel dimensions and
+  never blown up, so low-resolution concept art is not stretched into
+  pixelation and nothing is cropped. When the source carries fewer pixels
+  than the area it is shown in, the view says so instead of pretending.
+- **Zoom only when it is real.** A zoom control appears only when the source
+  holds at least twice the pixels of the area it would be shown in; zooming
+  then pans with the arrow keys or a drag. Below that threshold the action is
+  labelled "Full screen" and no zoom is offered.
 - **Presentation.** The stage carries a soft key light from the upper left and
   a deep vignette, the frame cross-fades on change, and the enlarged view
-  fills the viewport with the same lighting treatment.
+  carries the same lighting treatment.
 - **Variant selectors** are radio groups built on real radio inputs
   (`OptionGroup`), so keyboard behaviour and announcements come from the
-  platform. The legends read "demonstration only" and the hint under each
-  group states that no sizes, colourways or stock levels are published.
+  platform. The legends read "demonstration only", and the colourway group
+  states explicitly that selecting a label does not change the product
+  photography and that the options are not product variants.
 - **Size guide** publishes no measurements: the table shows the structure a
   live guide would use with every value marked "Not published".
 - **Wishlist** is device-local (`localStorage`), stores product slugs only,

@@ -94,12 +94,15 @@ be shared, and it is read back on load.
 ## Product experience
 
 - **Gallery** — thumbnails switch the frame, the stage responds to
-  `ArrowLeft`/`ArrowRight`, and a zoom button opens an enlarged view with the
-  same keyboard controls. `Escape` closes it and focus returns to the button
-  that opened it.
+  `ArrowLeft`/`ArrowRight`, and a "Full screen" action opens the complete
+  frame. The full-screen view shows the image with `object-contain` at its own
+  pixel size, so it is never stretched into pixelation and never cropped; a
+  zoom control only appears when the source resolution can support it, and
+  `Escape` closes the view and returns focus to the button that opened it.
 - **Variant selectors** — `OptionGroup` is a reusable radio group built on real
-  radio inputs, used for the demonstration sizes and colourways. The groups
-  are labelled "demonstration only" and never imply stock.
+  radio inputs, used for the demonstration sizes and colourway labels. The
+  colourway group states that selecting a label does not change the product
+  photography and that the options are not product variants.
 - **Size guide** — a dialog that shows the structure of a size guide with
   every measurement marked "Not published"; no garment measurements are
   invented.

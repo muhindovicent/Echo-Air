@@ -2,7 +2,11 @@
 
 import { useState } from "react";
 import { OptionGroup } from "@/components/shop/OptionGroup";
-import { DEMONSTRATION_VARIANT_NOTE, type ProductColour } from "@/lib/products";
+import {
+  COLOURWAY_VARIANT_NOTE,
+  DEMONSTRATION_VARIANT_NOTE,
+  type ProductColour,
+} from "@/lib/products";
 
 type ProductOptionsProps = {
   slug: string;
@@ -29,7 +33,7 @@ export function ProductOptions({
     colours.find((entry) => entry.id === colour)?.name ?? colour;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 md:space-y-8">
       <OptionGroup
         legend="Size — demonstration only"
         name={`size-${slug}`}
@@ -40,7 +44,7 @@ export function ProductOptions({
       />
 
       <OptionGroup
-        legend="Colourway — demonstration only"
+        legend="Colourway label — demonstration only"
         name={`colour-${slug}`}
         options={colours.map((entry) => ({
           id: entry.id,
@@ -49,7 +53,7 @@ export function ProductOptions({
         }))}
         value={colour}
         onChange={setColour}
-        hint={DEMONSTRATION_VARIANT_NOTE}
+        hint={COLOURWAY_VARIANT_NOTE}
       />
 
       <p
@@ -57,7 +61,7 @@ export function ProductOptions({
         className="label text-bone/55"
         aria-live="polite"
       >
-        Selected — size {size}, colourway {colourName}
+        Selected — size {size}, colourway label {colourName}
       </p>
     </div>
   );

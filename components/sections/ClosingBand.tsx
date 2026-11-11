@@ -6,7 +6,7 @@ export function ClosingBand() {
     <section aria-labelledby="closing-heading" className="bg-acid text-obsidian">
       <div className="mx-auto max-w-[1600px] px-5 py-16 md:px-10 md:py-24">
         <Reveal>
-          <p className="label text-obsidian/60">Phase 01 — Foundation</p>
+          <p className="label text-obsidian/60">Phase 03 — Product experience</p>
           <h2
             id="closing-heading"
             className="mt-6 text-[clamp(2rem,6vw,5rem)] font-medium uppercase leading-[0.92] tracking-[-0.035em]"
@@ -18,8 +18,8 @@ export function ClosingBand() {
             <p className="max-w-xl text-[1rem] leading-relaxed text-obsidian/75 md:col-span-6">
               Drop 01 opens once real campaign photography replaces the concept
               art and a commerce provider is connected. Until then this build
-              is a design foundation: homepage, design system and reusable
-              components.
+              is a frontend demonstration: catalogue, product previews and a
+              device-local wishlist, with nothing that can be ordered.
             </p>
             <div className="flex flex-wrap items-center gap-4 md:col-span-5 md:col-start-8 md:justify-end">
               <Link

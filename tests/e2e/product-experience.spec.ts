@@ -2,7 +2,7 @@ import { expect, test, type Page } from "@playwright/test";
 
 /** A product with two frames of the same garment. */
 const MULTI = "/shop/longform-overcoat";
-/** A product with a single frame Ã¢â‚¬â€ no switching controls allowed. */
+/** A product with a single frame - no switching controls allowed. */
 const SINGLE = "/shop/interval-runner";
 
 async function stageImage(page: Page): Promise<string> {
@@ -69,7 +69,7 @@ test.describe("product gallery", () => {
     const zoom = page.getByTestId("gallery-zoom");
     await zoom.click();
 
-    const dialog = page.getByRole("dialog", { name: /enlarged view/i });
+    const dialog = page.getByRole("dialog", { name: /full screen view/i });
     await expect(dialog).toBeVisible();
     await expect(dialog.locator(":focus")).toHaveCount(1);
 
@@ -105,7 +105,7 @@ test.describe("product gallery", () => {
 
     // The zoom view still works but offers no frame navigation.
     await page.getByTestId("gallery-zoom").click();
-    const dialog = page.getByRole("dialog", { name: /enlarged view/i });
+    const dialog = page.getByRole("dialog", { name: /full screen view/i });
     await expect(dialog).toBeVisible();
     await expect(dialog.getByRole("button", { name: /next/i })).toHaveCount(0);
     await expect(dialog.getByRole("button", { name: /previous/i })).toHaveCount(
@@ -131,6 +131,155 @@ test.describe("product gallery", () => {
   });
 });
 
+test.describe("full screen view", () => {
+  test("is labelled Full screen and offers no pixelated zoom", async ({
+    page,
+  }) => {
+    await page.goto(MULTI);
+
+    const action = page.getByTestId("gallery-zoom");
+    await expect(action).toContainText("Full screen");
+    await expect(action).not.toContainText("Zoom");
+
+    await action.click();
+    const dialog = page.getByRole("dialog", { name: /full screen view/i });
+    await expect(dialog).toBeVisible();
+
+    // The concept frames are low resolution, so no zoom control is offered.
+    await expect(page.getByTestId("gallery-zoom-toggle")).toHaveCount(0);
+    await expect(dialog.getByText(/source/i).first()).toBeVisible();
+  });
+
+  test("shows the complete frame without clipping or upscaling", async ({
+    page,
+  }) => {
+    await page.goto(MULTI);
+    await page.getByTestId("gallery-zoom").click();
+
+    const dialog = page.getByRole("dialog", { name: /full screen view/i });
+    await expect(dialog).toBeVisible();
+
+    const frame = page.getByTestId("gallery-contain");
+    await expect(frame).toBeVisible();
+
+    // Wait until the frame has actually decoded before measuring it.
+    await expect
+      .poll(() =>
+        frame.evaluate((node) => {
+          const image = node.querySelector("img");
+          return Boolean(image && image.complete && image.naturalWidth > 0);
+        }),
+      )
+      .toBe(true);
+
+    const metrics = await frame.evaluate((node) => {
+      const image = node.querySelector("img") as HTMLImageElement;
+      const box = node.getBoundingClientRect();
+      return {
+        objectFit: getComputedStyle(image).objectFit,
+        naturalWidth: image.naturalWidth,
+        naturalHeight: image.naturalHeight,
+        renderedWidth: box.width,
+        renderedHeight: box.height,
+      };
+    });
+
+    // The complete image is shown: object-contain, no cropping.
+    expect(metrics.objectFit).toBe("contain");
+
+    // The natural aspect ratio is preserved, so nothing is cut off.
+    const naturalAspect = metrics.naturalWidth / metrics.naturalHeight;
+    const renderedAspect = metrics.renderedWidth / metrics.renderedHeight;
+    expect(Math.abs(naturalAspect - renderedAspect)).toBeLessThan(0.02);
+
+    // The frame is never blown up beyond its own resolution.
+    expect(metrics.renderedWidth).toBeLessThanOrEqual(
+      metrics.naturalWidth + 1,
+    );
+    expect(metrics.renderedHeight).toBeLessThanOrEqual(
+      metrics.naturalHeight + 1,
+    );
+  });
+
+  test("keeps the full screen view inside the viewport", async ({ page }) => {
+    for (const viewport of [
+      { width: 375, height: 812 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto(MULTI);
+      await page.getByTestId("gallery-zoom").click();
+
+      const frame = page.getByTestId("gallery-contain");
+      await expect(frame).toBeVisible();
+
+      const box = await frame.boundingBox();
+      expect(box).not.toBeNull();
+      expect(box!.x).toBeGreaterThanOrEqual(-1);
+      expect(box!.y).toBeGreaterThanOrEqual(-1);
+      expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width + 1);
+      expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height + 1);
+
+      const overflow = await page.evaluate(() => ({
+        scrollWidth: document.documentElement.scrollWidth,
+        clientWidth: document.documentElement.clientWidth,
+      }));
+      expect(overflow.scrollWidth).toBeLessThanOrEqual(
+        overflow.clientWidth + 1,
+      );
+
+      await page.keyboard.press("Escape");
+      await expect(
+        page.getByRole("dialog", { name: /full screen view/i }),
+      ).toHaveCount(0);
+    }
+  });
+});
+
+test.describe("phase references and content clarity", () => {
+  test("no longer advertises Phase 01", async ({ page }) => {
+    await page.goto("/");
+
+    await expect(page.locator("header")).toContainText("Phase 03");
+    await expect(page.locator("footer")).toContainText("Phase 03");
+    await expect(page.locator("body")).not.toContainText("Phase 01");
+
+    await expect(page).toHaveTitle(/Phase 03/);
+  });
+
+  test("explains that colourway labels do not change the photography", async ({
+    page,
+  }) => {
+    await page.goto(MULTI);
+
+    const colours = page.getByRole("radiogroup", { name: /colourway/i });
+    await expect(colours).toBeVisible();
+    await expect(colours).toContainText(/does not change the product photography/i);
+    await expect(colours).toContainText(/not product variants/i);
+  });
+
+  test("keeps breathing room between the disclaimer and the selectors", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 375, height: 812 });
+    await page.goto(MULTI);
+
+    const disclaimer = page.getByText("Demonstration product").first();
+    const sizeLegend = page
+      .getByRole("radiogroup", { name: /size/i })
+      .locator("legend");
+
+    const disclaimerBox = await disclaimer.boundingBox();
+    const legendBox = await sizeLegend.boundingBox();
+
+    expect(disclaimerBox).not.toBeNull();
+    expect(legendBox).not.toBeNull();
+
+    const gap = legendBox!.y - (disclaimerBox!.y + disclaimerBox!.height);
+    expect(gap).toBeGreaterThanOrEqual(16);
+  });
+});
+
 test.describe("demonstration variants", () => {
   test("selects a size and a colourway", async ({ page }) => {
     await page.goto(MULTI);
@@ -149,7 +298,7 @@ test.describe("demonstration variants", () => {
     await expect(colours.getByRole("radio")).toHaveCount(3);
 
     await colours.getByRole("radio", { name: "Bone" }).check();
-    await expect(selected).toContainText("colourway Bone");
+    await expect(selected).toContainText("colourway label Bone");
   });
 
   test("changes the selection with the keyboard", async ({ page }) => {
@@ -166,7 +315,7 @@ test.describe("demonstration variants", () => {
     await page.goto(MULTI);
 
     await expect(
-      page.getByText(/demonstration variants only/i).first(),
+      page.getByText(/demonstration labels only/i).first(),
     ).toBeVisible();
 
     const text = (await page.locator("main").innerText()).toLowerCase();
