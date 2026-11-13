@@ -55,6 +55,22 @@ export function isBagEntry(value: unknown): value is BagEntry {
 }
 
 /**
+ * Normalises a stored quantity.
+ *
+ * Anything that is not a finite number is rejected (`null` means the entry is
+ * invalid and should be dropped). A finite number is reduced to a whole
+ * number and clamped into the allowed range.
+ */
+export function normaliseQuantity(
+  value: number,
+): number | null {
+  if (!Number.isFinite(value)) return null;
+  if (value < MIN_QUANTITY) return MIN_QUANTITY;
+  if (value > MAX_QUANTITY) return MAX_QUANTITY;
+  return Math.floor(value);
+}
+
+/**
  * Drops anything that does not match the current demonstration catalogue and
  * merges entries that describe the same selection.
  */
@@ -75,10 +91,8 @@ export function sanitiseEntries(value: unknown): BagEntry[] {
     const colour = product.colours.find((item) => item.id === raw.colour);
     if (!colour) continue;
 
-    const quantity = Math.min(
-      MAX_QUANTITY,
-      Math.max(MIN_QUANTITY, Math.floor(raw.quantity)),
-    );
+    const quantity = normaliseQuantity(raw.quantity);
+    if (quantity === null) continue;
 
     const entry: BagEntry = {
       slug: product.slug,
@@ -89,10 +103,9 @@ export function sanitiseEntries(value: unknown): BagEntry[] {
 
     const existing = merged.find((item) => lineKey(item) === lineKey(entry));
     if (existing) {
-      existing.quantity = Math.min(
-        MAX_QUANTITY,
+      existing.quantity = normaliseQuantity(
         existing.quantity + entry.quantity,
-      );
+      ) as number;
     } else {
       merged.push(entry);
     }

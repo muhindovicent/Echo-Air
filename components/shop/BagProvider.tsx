@@ -13,9 +13,9 @@ import {
   countItems,
   countLines,
   lineKey,
-  MAX_QUANTITY,
   MIN_QUANTITY,
   mergeEntry,
+  normaliseQuantity,
   resolveLines,
   sanitiseEntries,
   type BagEntry,
@@ -148,17 +148,12 @@ export function BagProvider({ children }: { children: ReactNode }) {
   );
 
   const setQuantity = useCallback((key: string, quantity: number) => {
+    const normalised = normaliseQuantity(quantity);
+    if (normalised === null) return;
+
     write(
       getSnapshot().map((entry) =>
-        lineKey(entry) === key
-          ? {
-              ...entry,
-              quantity: Math.min(
-                MAX_QUANTITY,
-                Math.max(MIN_QUANTITY, Math.floor(quantity)),
-              ),
-            }
-          : entry,
+        lineKey(entry) === key ? { ...entry, quantity: normalised } : entry,
       ),
     );
   }, []);
