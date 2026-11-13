@@ -180,4 +180,52 @@ test.describe("review screenshots", () => {
       ).toBeVisible();
     });
   }
+
+  for (const shot of [
+    { name: "bag-drawer-desktop-1440", width: 1440, height: 900 },
+    { name: "bag-drawer-mobile-375", width: 375, height: 812 },
+  ]) {
+    test(`captures ${shot.name}`, async ({ page }) => {
+      await page.setViewportSize({ width: shot.width, height: shot.height });
+      await page.goto("/shop/longform-overcoat");
+
+      await page.getByTestId("add-to-bag").click();
+      await expect(page.getByTestId("add-to-bag")).toHaveAttribute(
+        "data-state",
+        "added",
+      );
+
+      await page.getByTestId("bag-button").click();
+      await expect(
+        page.getByRole("dialog", { name: /demonstration bag/i }),
+      ).toBeVisible();
+
+      await page.screenshot({
+        path: path.join(OUT, `${shot.name}.jpg`),
+        type: "jpeg",
+        quality: 78,
+      });
+    });
+  }
+
+  test("captures the bag page", async ({ page }) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto("/shop/longform-overcoat");
+
+    await page.getByTestId("add-to-bag").click();
+    await expect(page.getByTestId("add-to-bag")).toHaveAttribute(
+      "data-state",
+      "added",
+    );
+
+    await page.goto("/bag");
+    await expect(page.getByTestId("bag-line")).toHaveCount(1);
+
+    await page.screenshot({
+      path: path.join(OUT, "bag-page-desktop-1440.jpg"),
+      fullPage: true,
+      type: "jpeg",
+      quality: 78,
+    });
+  });
 });

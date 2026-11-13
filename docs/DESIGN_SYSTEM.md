@@ -86,6 +86,11 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
 | `WishlistProvider`   | `components/shop/WishlistProvider.tsx` | Wishlist state backed by `localStorage`  |
 | `WishlistButton`     | `components/shop/WishlistButton.tsx` | Save/remove a piece                     |
 | `WishlistGrid`       | `components/shop/WishlistGrid.tsx` | Saved pieces and empty state               |
+| `BagProvider`        | `components/shop/BagProvider.tsx` | Demonstration bag state (`localStorage`) |
+| `BagDrawer`          | `components/shop/BagDrawer.tsx`  | Slide-in bag drawer                        |
+| `BagLineItem`        | `components/shop/BagLineItem.tsx` | Bag line with quantity stepper             |
+| `AddToBagButton`     | `components/shop/AddToBagButton.tsx` | Add the current selection to the bag |
+| `BagPageContent`     | `components/shop/BagPageContent.tsx` | The full bag page                     |
 | `ActionLink`         | `components/ui/ActionLink.tsx`     | Solid / ghost / quiet link variants          |
 | `ConceptFigure`      | `components/ui/ConceptFigure.tsx`  | Fixed-ratio frame, concept tag, duotone grade |
 | `Reveal`             | `components/ui/Reveal.tsx`         | Intersection-observer scroll reveal          |
@@ -134,6 +139,12 @@ hero headline uses `.text-stroke` (outlined type) as the closing beat.
   live guide would use with every value marked "Not published".
 - **Wishlist** is device-local (`localStorage`), stores product slugs only,
   and never implies a reservation, a stock hold or an order.
+- **Demo bag** is a separate device-local store from the wishlist. It stores
+  only the product slug, the selected demonstration size, the colourway id and
+  a quantity. Entries are validated against the current catalogue on read and
+  merged when they describe the same selection. There is no price, total,
+  stock, delivery, checkout or payment anywhere in it, and the drawer and the
+  bag page both say so.
 
 ### Dialogs
 

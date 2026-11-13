@@ -45,7 +45,10 @@ jobs:
         run: npm ci
 
       - name: Install Playwright browsers
-        run: npx playwright install --with-deps chromium
+        # The apt step behind --with-deps occasionally fails when the Ubuntu
+        # mirrors are unreachable, which fails the whole job even though the
+        # browser download itself is fine. Fall back to the browser alone.
+        run: npx playwright install --with-deps chromium || npx playwright install chromium
 
       - name: Production build
         run: npm run build

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AddToBagButton } from "@/components/shop/AddToBagButton";
 import { OptionGroup } from "@/components/shop/OptionGroup";
 import {
   COLOURWAY_VARIANT_NOTE,
@@ -63,6 +64,14 @@ export function ProductOptions({
       >
         Selected — size {size}, colourway label {colourName}
       </p>
+
+      <div className="flex flex-wrap items-center gap-4 pt-2">
+        <AddToBagButton slug={slug} size={size} colour={colour} />
+        <p className="max-w-xs text-[0.8rem] leading-relaxed text-bone/45">
+          Adds the piece to a demonstration bag on this device. No price, stock
+          or checkout is involved.
+        </p>
+      </div>
     </div>
   );
 }

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useModalDialog } from "@/components/ui/useModalDialog";
+import { useBag } from "@/components/shop/BagProvider";
 import { useWishlist } from "@/components/shop/WishlistProvider";
 import { cn } from "@/lib/cn";
 import { navItems } from "@/lib/content";
@@ -11,6 +12,7 @@ export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { count: wishlistCount } = useWishlist();
+  const { count: bagCount, openDrawer: openBag } = useBag();
   const panelRef = useRef<HTMLDivElement>(null);
   const toggleRef = useRef<HTMLButtonElement>(null);
 
@@ -93,7 +95,43 @@ export function SiteHeader() {
                 </span>
               ) : null}
             </Link>
-            <span className="label hidden text-ash xl:block">Phase 03</span>
+
+            <button
+              type="button"
+              onClick={openBag}
+              aria-haspopup="dialog"
+              aria-controls="bag-drawer"
+              aria-label={
+                bagCount > 0
+                  ? `Demo bag, ${bagCount} ${bagCount === 1 ? "piece" : "pieces"}`
+                  : "Demo bag, empty"
+              }
+              data-testid="bag-button"
+              className="label group flex items-center gap-2 border border-bone/20 px-3 py-2 text-bone/85 transition-colors duration-300 hover:border-acid hover:text-acid"
+            >
+              <svg
+                aria-hidden="true"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.5"
+                className="h-4 w-4"
+              >
+                <path d="M6 7h12l-1 13H7L6 7Z" />
+                <path d="M9 7V5.5a3 3 0 0 1 6 0V7" />
+              </svg>
+              <span className="hidden sm:inline">Bag</span>
+              {bagCount > 0 ? (
+                <span
+                  data-testid="bag-count"
+                  className="grid h-5 min-w-5 place-items-center bg-acid px-1 text-[0.65rem] font-medium text-obsidian"
+                >
+                  {bagCount}
+                </span>
+              ) : null}
+            </button>
+
+            <span className="label hidden text-ash xl:block">Phase 04</span>
             <button
               ref={toggleRef}
               type="button"
@@ -181,14 +219,29 @@ export function SiteHeader() {
                   ) : null}
                 </Link>
               </li>
+              <li>
+                <Link
+                  href="/bag"
+                  onClick={closeMenu}
+                  className="flex items-baseline gap-5 text-[clamp(2.25rem,11vw,3.5rem)] font-medium leading-[1.05] tracking-[-0.03em] transition-colors duration-300 hover:text-obsidian/60"
+                >
+                  <span className="label text-obsidian/45">
+                    0{navItems.length + 2}
+                  </span>
+                  Bag
+                  {bagCount > 0 ? (
+                    <span className="label text-obsidian/45">({bagCount})</span>
+                  ) : null}
+                </Link>
+              </li>
             </ul>
 
             <div className="mt-14 border-t border-obsidian/15 pt-8">
-              <p className="label text-obsidian/50">Phase 03 — Product experience</p>
+              <p className="label text-obsidian/50">Phase 04 — Demo bag</p>
               <p className="mt-4 max-w-sm text-[0.95rem] leading-relaxed text-obsidian/70">
-                The catalogue, product previews and wishlist are working
-                demonstrations. There is no checkout and nothing can be ordered,
-                so every image on the site is placeholder art.
+                The catalogue, product previews, wishlist and the demo bag are
+                working demonstrations. There is no checkout and nothing can be
+                ordered, so every image on the site is placeholder art.
               </p>
             </div>
           </nav>

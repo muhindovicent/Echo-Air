@@ -23,6 +23,9 @@ so reviewers can see the result without running the site.
 | `product-mobile-375.jpg` | Product preview 375×812, full page |
 | `wishlist-desktop-1440.jpg` | Wishlist with a saved piece, 1440×900 |
 | `wishlist-mobile-375.jpg` | Wishlist with a saved piece, 375×812 |
+| `bag-drawer-desktop-1440.jpg` | Demonstration bag drawer open, 1440×900 |
+| `bag-drawer-mobile-375.jpg` | Demonstration bag drawer open, 375×812 |
+| `bag-page-desktop-1440.jpg` | The `/bag` page with a piece in the bag |
 
 Regenerate:
 

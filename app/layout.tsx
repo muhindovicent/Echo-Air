@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { IBM_Plex_Mono, Space_Grotesk } from "next/font/google";
 import { SiteFooter } from "@/components/chrome/SiteFooter";
 import { SiteHeader } from "@/components/chrome/SiteHeader";
+import { BagProvider } from "@/components/shop/BagProvider";
 import { WishlistProvider } from "@/components/shop/WishlistProvider";
 import "./globals.css";
 
@@ -20,16 +21,16 @@ const ibmPlexMono = IBM_Plex_Mono({
 
 export const metadata: Metadata = {
   title: {
-    default: "Echo & Air — Concept Storefront (Phase 03)",
+    default: "Echo & Air — Concept Storefront (Phase 04)",
     template: "%s — Echo & Air",
   },
   description:
-    "Echo & Air is a streetwear label building heavyweight outerwear and essentials. This is the Phase 03 concept storefront: catalogue, product previews with gallery, demonstration variants and a local wishlist. No orders are taken yet.",
+    "Echo & Air is a streetwear label building heavyweight outerwear and essentials. This is the Phase 04 concept storefront: catalogue, product previews, demonstration variants and a local demo bag. No orders are taken yet.",
   applicationName: "Echo & Air",
   openGraph: {
-    title: "Echo & Air — Concept Storefront (Phase 03)",
+    title: "Echo & Air — Concept Storefront (Phase 04)",
     description:
-      "Phase 03 concept storefront for Echo & Air: demonstration catalogue, product previews and a local wishlist. Nothing can be ordered and the checkout is not live.",
+      "Phase 04 concept storefront for Echo & Air: demonstration catalogue, product previews, a local wishlist and demo bag. Nothing can be ordered and the checkout is not live.",
     type: "website",
     siteName: "Echo & Air",
   },
@@ -69,9 +70,11 @@ export default function RootLayout({
           Skip to content
         </a>
         <WishlistProvider>
-          <SiteHeader />
-          <main id="main">{children}</main>
-          <SiteFooter />
+          <BagProvider>
+            <SiteHeader />
+            <main id="main">{children}</main>
+            <SiteFooter />
+          </BagProvider>
         </WishlistProvider>
       </body>
     </html>

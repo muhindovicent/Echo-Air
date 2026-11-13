@@ -237,14 +237,15 @@ test.describe("full screen view", () => {
 });
 
 test.describe("phase references and content clarity", () => {
-  test("no longer advertises Phase 01", async ({ page }) => {
+  test("no longer advertises an earlier phase", async ({ page }) => {
     await page.goto("/");
 
-    await expect(page.locator("header")).toContainText("Phase 03");
-    await expect(page.locator("footer")).toContainText("Phase 03");
+    await expect(page.locator("header")).toContainText("Phase 04");
+    await expect(page.locator("footer")).toContainText("Phase 04");
     await expect(page.locator("body")).not.toContainText("Phase 01");
+    await expect(page.locator("body")).not.toContainText("Phase 03");
 
-    await expect(page).toHaveTitle(/Phase 03/);
+    await expect(page).toHaveTitle(/Phase 04/);
   });
 
   test("explains that colourway labels do not change the photography", async ({
