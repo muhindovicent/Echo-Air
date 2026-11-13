@@ -10,7 +10,8 @@
     "typecheck": "tsc --noEmit",
     "test": "npm run build && npm run test:e2e",
     "test:e2e": "playwright test",
-    "test:e2e:install": "playwright install chromium"
+    "test:e2e:install": "playwright install chromium",
+    "test:unit": "node --experimental-strip-types tests/lib/commerce-validation.test.ts"
   },
   "dependencies": {
     "next": "16.4.6",
