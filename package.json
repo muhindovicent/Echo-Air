@@ -11,9 +11,11 @@
     "test": "npm run build && npm run test:e2e",
     "test:e2e": "playwright test",
     "test:e2e:install": "playwright install chromium",
-    "test:unit": "node --experimental-strip-types tests/lib/commerce-validation.test.ts"
+    "test:unit": "node --experimental-strip-types tests/lib/commerce-validation.test.ts",
+    "test:integration": "node --experimental-strip-types tests/lib/postgres-store.test.ts"
   },
   "dependencies": {
+    "@prisma/client": "^6.19.3",
     "next": "16.4.6",
     "react": "19.3.0",
     "react-dom": "19.3.0"
@@ -26,7 +28,13 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.4.6",
+    "prisma": "^6.19.3",
     "tailwindcss": "4.3.3",
     "typescript": "^5"
+  },
+  "allowScripts": {
+    "@prisma/client@6.19.3": true,
+    "prisma@6.19.3": true,
+    "@prisma/engines@6.19.3": true
   }
 }

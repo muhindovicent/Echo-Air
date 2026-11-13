@@ -2,7 +2,7 @@ name: Unit Tests
 
 on:
   push:
-    branches: [main, feat/phase-05a-commerce-foundation]
+    branches: [main, feat/phase-05a-commerce-foundation, feat/phase-05b-postgresql-backend]
   pull_request:
     branches: [main]
 

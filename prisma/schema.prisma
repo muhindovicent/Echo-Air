@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum PublicationStatus {
+  DRAFT
+  PUBLISHED
+  UNPUBLISHED
+}
+
+enum MovementType {
+  ADD
+  REMOVE
+  SET
+  ADJUST
+}
+
+enum OrderStatus {
+  PENDING
+  PAID
+  SHIPPED
+  CANCELLED
+  REFUNDED
+}
+
+model Product {
+  id                String           @id @default(cuid())
+  slug              String           @unique
+  category          String
+  name              String
+  description       String
+  basePriceAmount   Int
+  basePriceCurrency String           @default("USD")
+  publicationStatus PublicationStatus @default(DRAFT)
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  variants          ProductVariant[]
+  images            ProductImage[]
+
+  @@index([slug])
+  @@index([category])
+  @@index([publicationStatus])
+}
+
+model ProductVariant {
+  id                String          @id @default(cuid())
+  product           Product         @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId         String
+  sku               String          @unique
+  size              String
+  color             String
+  priceAdjustment   Int             @default(0)
+  inventory         Int             @default(0)
+
+  images            ProductImage[]
+  movements         InventoryMovement[]
+  orderItems        OrderItem[]
+
+  @@index([productId])
+  @@index([sku])
+}
+
+model ProductImage {
+  id        String   @id @default(cuid())
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  productId String
+  variant   ProductVariant? @relation(fields: [variantId], references: [id], onDelete: SetNull)
+  variantId String?
+  url       String
+  alt       String?
+  sortOrder Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([productId])
+  @@index([variantId])
+}
+
+model InventoryMovement {
+  id        String        @id @default(cuid())
+  variant   ProductVariant @relation(fields: [variantId], references: [id])
+  variantId String
+  quantity  Int
+  type      MovementType
+  reason    String?
+  createdAt DateTime      @default(now())
+
+  @@index([variantId])
+  @@index([createdAt])
+}
+
+model Order {
+  id           String       @id @default(cuid())
+  customerEmail String
+  status       OrderStatus @default(PENDING)
+  totalAmount  Int
+  currency     String       @default("USD")
+  createdAt    DateTime     @default(now())
+  updatedAt    DateTime     @updatedAt
+
+  items        OrderItem[]
+
+  @@index([status])
+  @@index([createdAt])
+}
+
+model OrderItem {
+  id             String   @id @default(cuid())
+  order          Order    @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  orderId        String
+  variant        ProductVariant @relation(fields: [variantId], references: [id])
+  variantId      String
+  quantity       Int
+  unitPriceAmount Int
+  unitPriceCurrency String @default("USD")
+
+  @@index([orderId])
+  @@index([variantId])
+}
