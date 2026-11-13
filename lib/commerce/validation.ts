@@ -58,29 +58,39 @@ function isValidImage(value: unknown): value is string {
 /**
  * A valid ISO 8601 timestamp value.
  *
- * Checks both the string format and that the value parses to a real date
- * (rejects e.g. "2026-13-45T99:99:99Z" which matches the format but is not
- * a real timestamp). JavaScript's Date is lenient (e.g. "2023-02-29" rolls
- * over to March 1), so we verify the parsed date's month and day match the
- * original to catch day/month overflow.
+ * Checks both the string format and that the value parses to a real date.
+ * JavaScript's Date is lenient (e.g. "2023-02-29" rolls over to March 1),
+ * so we validate the calendar components extracted from the string against
+ * what Date.UTC produces, catching day/month overflow and invalid leap days
+ * for both UTC and timezone-offset timestamps.
  */
 function isValidIsoTimestamp(value: unknown): value is string {
   if (typeof value !== "string" || value.length === 0) return false;
   if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.test(value)) {
     return false;
   }
+
+  // Extract calendar components from the string as written.
+  const year = Number(value.slice(0, 4));
+  const month = Number(value.slice(5, 7));
+  const day = Number(value.slice(8, 10));
+
+  // Basic range checks.
+  if (month < 1 || month > 12) return false;
+  if (day < 1 || day > 31) return false;
+
+  // Date.UTC normalizes out-of-range dates, so round-trip check catches
+  // invalid leap days and day/month overflow regardless of timezone offset.
+  const ms = Date.UTC(year, month - 1, day);
+  if (Number.isNaN(ms)) return false;
+  const check = new Date(ms);
+  if (check.getUTCFullYear() !== year) return false;
+  if (check.getUTCMonth() !== month - 1) return false;
+  if (check.getUTCDate() !== day) return false;
+
+  // The full string must also parse to a real time.
   const parsed = new Date(value);
-  if (Number.isNaN(parsed.getTime())) return false;
-
-  // Round-trip check for UTC timestamps only: re-serialize and compare the
-  // date portion to reject lenient rollovers like 2023-02-29 -> 2023-03-01.
-  // For offset timestamps, only validate parseability (offset shifts UTC date).
-  if (value.endsWith("Z") || !/[+-]\d{2}:\d{2}$/.test(value)) {
-    const iso = parsed.toISOString();
-    return iso.startsWith(value.slice(0, 10));
-  }
-
-  return true;
+  return !Number.isNaN(parsed.getTime());
 }
 
 /** A valid inventory quantity: a non-negative integer. */

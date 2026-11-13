@@ -558,6 +558,34 @@ describe("commerce validation", () => {
       );
     });
 
+    it("accepts valid leap year date with timezone offset", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2024-02-29T00:00:00+05:30" })).valid,
+        true,
+      );
+    });
+
+    it("rejects non-leap year Feb 29 with timezone offset", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2023-02-29T00:00:00+03:00" })).valid,
+        false,
+      );
+    });
+
+    it("rejects month 13 with timezone offset", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2026-13-01T00:00:00+05:30" })).valid,
+        false,
+      );
+    });
+
+    it("rejects day 32 with timezone offset", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2026-01-32T00:00:00+05:30" })).valid,
+        false,
+      );
+    });
+
     it("rejects empty updatedAt", () => {
       assert.strictEqual(validateProduct(validProduct({ updatedAt: "" })).valid, false);
     });
