@@ -151,3 +151,11 @@ ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_orderId_fkey" FOREIGN KEY ("or
 
 -- AddForeignKey
 ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_variantId_fkey" FOREIGN KEY ("variantId") REFERENCES "ProductVariant"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- Check constraints
+ALTER TABLE "Product" ADD CONSTRAINT "Product_basePriceAmount_check" CHECK ("basePriceAmount" >= 0);
+ALTER TABLE "ProductVariant" ADD CONSTRAINT "ProductVariant_inventory_check" CHECK ("inventory" >= 0);
+ALTER TABLE "InventoryMovement" ADD CONSTRAINT "InventoryMovement_quantity_check" CHECK ("quantity" <> 0);
+ALTER TABLE "Order" ADD CONSTRAINT "Order_totalAmount_check" CHECK ("totalAmount" >= 0);
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_quantity_check" CHECK ("quantity" > 0);
+ALTER TABLE "OrderItem" ADD CONSTRAINT "OrderItem_unitPriceAmount_check" CHECK ("unitPriceAmount" >= 0);

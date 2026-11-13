@@ -3,16 +3,21 @@
  *
  * These tests require a live PostgreSQL instance configured through the
  * `TEST_DATABASE_URL` environment variable. If that variable is not set,
- * every test in this file is skipped and a clear message is reported — no
- * results are fabricated and no database is assumed to exist.
+ * every test in this file is skipped (not passed) and a clear message is
+ * reported — no results are fabricated and no database is assumed to exist.
+ *
+ * The Prisma client is injected into the store through its constructor so
+ * that tests use an explicitly configured, isolated test database and can
+ * never accidentally access a production database.
  *
  * Tests verify:
  * - Migrations apply cleanly against an isolated test database
- * - Product/variant relationships persist and load correctly
- * - Unique SKUs and slugs are enforced at the database level
+ * - Product/variant/image relationships persist and load correctly
+ * - Unique SKUs and slugs are enforced at the database level (rejected inserts)
  * - Unpublished products are never returned by published-product queries
  * - Cross-product uniqueness (variant SKUs) blocks publication
  * - Product inventory is derived from variant inventory (source of truth)
+ * - Read-only API responses exclude unpublished products
  */
 
 import { describe, it, beforeEach, afterEach } from "node:test";
@@ -22,7 +27,6 @@ import { PrismaClient } from "@prisma/client";
 import type { CommercialProduct } from "../../lib/commerce/types.ts";
 import {
   PostgresCommerceStore,
-  disconnectPrisma,
 } from "../../lib/commerce/postgres-server.ts";
 import { validateCatalog } from "../../lib/commerce/validation.ts";
 
@@ -31,11 +35,9 @@ const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL;
 /** Skip all tests when no test database is configured. */
 if (!TEST_DATABASE_URL) {
   describe("commerce integration (PostgreSQL)", () => {
-    it("skipped: TEST_DATABASE_URL is not configured", () => {
-      console.log(
-        "Skipping PostgreSQL integration tests: set TEST_DATABASE_URL to run against an isolated test database.",
-      );
-      assert.ok(true, "test database not configured — tests skipped");
+    it.skip("skipped: TEST_DATABASE_URL is not configured", () => {
+      // Tests cannot execute without an isolated test database.
+      // Report as NOT RUN, not passed.
     });
   });
 } else {
@@ -74,11 +76,10 @@ if (!TEST_DATABASE_URL) {
       afterEach(async () => {
         await truncateTables();
         await prisma.$disconnect();
-        await disconnectPrisma();
       });
 
-      it("loads a published product with its variants", async () => {
-        await prisma.product.create({
+      it("loads a published product with its variants and images", async () => {
+        const product = await prisma.product.create({
           data: {
             slug: "integration-coat",
             category: "outerwear",
@@ -111,7 +112,29 @@ if (!TEST_DATABASE_URL) {
           },
         });
 
-        const store = new PostgresCommerceStore();
+        // Add variant images after product creation.
+        await prisma.productImage.create({
+          data: {
+            productId: product.id,
+            variantId: product.variants[0].id,
+            url: "/concept/piece-outerwear.jpg",
+            alt: "Front",
+          },
+        });
+        await prisma.productImage.create({
+          data: {
+            productId: product.id,
+            variantId: product.variants[1].id,
+            url: "/concept/piece-outerwear.jpg",
+            alt: "Side",
+          },
+        });
+
+        assert.strictEqual(product.slug, "integration-coat");
+        assert.strictEqual(product.publicationStatus, "PUBLISHED");
+        assert.strictEqual(product.variants.length, 2);
+
+        const store = new PostgresCommerceStore(prisma);
         const published = await store.getPublishedProducts();
         assert.ok(
           published.some((p) => p.slug === "integration-coat"),
@@ -135,7 +158,7 @@ if (!TEST_DATABASE_URL) {
           },
         });
 
-        const store = new PostgresCommerceStore();
+        const store = new PostgresCommerceStore(prisma);
         const published = await store.getPublishedProducts();
         assert.ok(
           !published.some((p) => p.slug === "integration-unpublished"),
@@ -159,12 +182,64 @@ if (!TEST_DATABASE_URL) {
           },
         });
 
-        const store = new PostgresCommerceStore();
+        const store = new PostgresCommerceStore(prisma);
         const product = await store.getProductBySlug("integration-hidden");
         assert.strictEqual(
           product,
           undefined,
           "unpublished product must be undefined",
+        );
+      });
+
+      it("maps PUBLISHED status to 'published' in commerce model", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "integration-published",
+            category: "outerwear",
+            name: "Published Coat",
+            description: "Published test coat.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: {
+              create: [{ sku: "INT-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }],
+            },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+        const product = await store.getProductBySlug("integration-published");
+        assert.ok(product, "published product should be found");
+        assert.strictEqual(
+          product!.publicationStatus,
+          "published",
+          "PUBLISHED should map to 'published'",
+        );
+      });
+
+      it("maps DRAFT status to 'draft' in commerce model", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "integration-draft",
+            category: "outerwear",
+            name: "Draft Coat",
+            description: "Draft test coat.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: {
+              create: [{ sku: "INT-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }],
+            },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+        const product = await store.getProductBySlug("integration-draft");
+        assert.ok(product, "draft product should be found");
+        assert.strictEqual(
+          product!.publicationStatus,
+          "draft",
+          "DRAFT should map to 'draft'",
         );
       });
     });
@@ -180,10 +255,9 @@ if (!TEST_DATABASE_URL) {
       afterEach(async () => {
         await truncateTables();
         await prisma.$disconnect();
-        await disconnectPrisma();
       });
 
-      it("rejects duplicate product slugs", async () => {
+      it("rejects duplicate product slugs at the database level", async () => {
         await prisma.product.create({
           data: {
             slug: "dup-slug-product",
@@ -220,7 +294,7 @@ if (!TEST_DATABASE_URL) {
         );
       });
 
-      it("rejects duplicate variant SKUs via validateCatalog", async () => {
+      it("rejects duplicate variant SKUs at the database level", async () => {
         await prisma.product.create({
           data: {
             slug: "sku-dup-prod-1",
@@ -235,6 +309,43 @@ if (!TEST_DATABASE_URL) {
             },
           },
         });
+
+        await assert.rejects(
+          () =>
+            prisma.product.create({
+              data: {
+                slug: "sku-dup-prod-2",
+                category: "outerwear",
+                name: "Second Product",
+                description: "Second.",
+                basePriceAmount: 10000,
+                basePriceCurrency: "USD",
+                publicationStatus: "DRAFT",
+                variants: {
+                  create: [{ sku: "UNIQUE-SKU-001", size: "L", color: "Black", inventory: 1 }],
+                },
+              },
+            }),
+          /Unique constraint/,
+          "duplicate variant SKU should violate the unique constraint",
+        );
+      });
+
+      it("flags duplicate variant SKUs via validateCatalog", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "sku-dup-prod-1",
+            category: "outerwear",
+            name: "First Product",
+            description: "First.",
+            basePriceAmount: 10000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: {
+              create: [{ sku: "UNIQUE-SKU-002", size: "M", color: "Black", inventory: 1 }],
+            },
+          },
+        });
         await prisma.product.create({
           data: {
             slug: "sku-dup-prod-2",
@@ -245,7 +356,7 @@ if (!TEST_DATABASE_URL) {
             basePriceCurrency: "USD",
             publicationStatus: "DRAFT",
             variants: {
-              create: [{ sku: "UNIQUE-SKU-001", size: "L", color: "Black", inventory: 1 }],
+              create: [{ sku: "UNIQUE-SKU-002", size: "L", color: "Black", inventory: 1 }],
             },
           },
         });
@@ -289,7 +400,7 @@ if (!TEST_DATABASE_URL) {
           },
         });
 
-        const store = new PostgresCommerceStore();
+        const store = new PostgresCommerceStore(prisma);
         const published = await store.getPublishedProducts();
         // Both share variant SKU "CONFLICT-SKU-99", so neither can be published.
         assert.strictEqual(
@@ -311,7 +422,6 @@ if (!TEST_DATABASE_URL) {
       afterEach(async () => {
         await truncateTables();
         await prisma.$disconnect();
-        await disconnectPrisma();
       });
 
       it("product inventory equals the sum of variant inventories", async () => {
@@ -333,7 +443,7 @@ if (!TEST_DATABASE_URL) {
           },
         });
 
-        const store = new PostgresCommerceStore();
+        const store = new PostgresCommerceStore(prisma);
         const published = await store.getPublishedProducts();
         const product = published.find((p) => p.slug === "inventory-prod");
         assert.ok(product, "product should be published");
@@ -342,6 +452,84 @@ if (!TEST_DATABASE_URL) {
           50,
           "product inventory (50) should equal sum of variant inventories (30 + 20)",
         );
+      });
+    });
+
+    describe("search and category filters", () => {
+      beforeEach(async () => {
+        prisma = new PrismaClient({
+          datasources: { db: { url: TEST_DATABASE_URL } },
+        });
+        await prisma.$connect();
+      });
+
+      afterEach(async () => {
+        await truncateTables();
+        await prisma.$disconnect();
+      });
+
+      it("searchProducts returns only published products", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "search-published",
+            category: "outerwear",
+            name: "Published Searchable Coat",
+            description: "Published.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "SEARCH-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "search-draft",
+            category: "outerwear",
+            name: "Draft Searchable Coat",
+            description: "Draft.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "SEARCH-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+        const results = await store.searchProducts("coat");
+        assert.strictEqual(results.length, 1);
+        assert.strictEqual(results[0].slug, "search-published");
+      });
+
+      it("filterByCategory returns only published products", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "filter-published",
+            category: "outerwear",
+            name: "Published Category Coat",
+            description: "Published.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "FILTER-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "filter-draft",
+            category: "outerwear",
+            name: "Draft Category Coat",
+            description: "Draft.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "FILTER-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+        const results = await store.filterByCategory("outerwear");
+        assert.strictEqual(results.length, 1);
+        assert.strictEqual(results[0].slug, "filter-published");
       });
     });
   });

@@ -31,19 +31,20 @@ import {
 } from "./validation.ts";
 import { CURRENCIES } from "./validation.ts";
 
-/** Singleton Prisma Client instance for the server. */
-const prisma = new PrismaClient();
-
-/** Map a Prisma currency string to the `CurrencyCode` union. */
-function toCurrencyCode(value: string): CurrencyCode {
-  return value as CurrencyCode;
-}
-
-/** Map a Prisma publication status to the `PublicationStatus` union. */
+/** Map a Prisma publication-status enum value to the commerce union type. */
 function toPublicationStatus(
   value: string,
 ): CommercialProduct["publicationStatus"] {
-  return value as CommercialProduct["publicationStatus"];
+  switch (value) {
+    case "PUBLISHED":
+      return "published";
+    case "DRAFT":
+      return "draft";
+    case "UNPUBLISHED":
+      return "unpublished";
+    default:
+      throw new Error(`Unknown publication status: ${value}`);
+  }
 }
 
 /** Map a Prisma `ProductImage` to a variant image source string. */
@@ -99,7 +100,7 @@ function mapProductToCommercialProduct(
 
   const price: Price = {
     amount: product.basePriceAmount,
-    currency: toCurrencyCode(product.basePriceCurrency),
+    currency: product.basePriceCurrency as CurrencyCode,
   };
 
   // Product inventory is derived from variant inventory (source of truth).
@@ -127,7 +128,9 @@ function mapProductToCommercialProduct(
  * Load every commercial product with its variants and images from the
  * database, mapped to `CommercialProduct` records.
  */
-async function loadCatalog(): Promise<CommercialProduct[]> {
+async function loadCatalog(
+  prisma: PrismaClient,
+): Promise<CommercialProduct[]> {
   const rows = await prisma.product.findMany({
     include: {
       variants: {
@@ -152,16 +155,28 @@ async function loadCatalog(): Promise<CommercialProduct[]> {
  * purchasable. Unpublished products are never returned by
  * `getProductBySlug`, `getProductById`, `searchProducts` or
  * `filterByCategory`.
+ *
+ * A Prisma client is injected through the constructor so that the store can
+ * be reused across requests without disconnecting between them. When no
+ * client is supplied, the store creates its own client bound to
+ * `DATABASE_URL`; constructing it does not require a database to be
+ * reachable, but every query will fail clearly if the database is absent.
  */
 export class PostgresCommerceStore implements CommerceStore {
+  private prisma: PrismaClient;
+
+  constructor(prismaClient?: PrismaClient) {
+    this.prisma = prismaClient ?? new PrismaClient();
+  }
+
   /** All commercial products in the catalog (unfiltered). */
   async getAllProducts(): Promise<readonly CommercialProduct[]> {
-    return loadCatalog();
+    return loadCatalog(this.prisma);
   }
 
   /** Products cleared for purchase (validated and published, catalog-safe). */
   async getPublishedProducts(): Promise<readonly CommercialProduct[]> {
-    const catalog = await loadCatalog();
+    const catalog = await loadCatalog(this.prisma);
     return catalog.filter((product) =>
       canPublishInCatalog(product, catalog),
     );
@@ -171,7 +186,7 @@ export class PostgresCommerceStore implements CommerceStore {
   async getProductBySlug(
     slug: string,
   ): Promise<CommercialProduct | undefined> {
-    const catalog = await loadCatalog();
+    const catalog = await loadCatalog(this.prisma);
     const product = catalog.find((item) => item.slug === slug);
     if (!product || !canPublish(product)) return undefined;
     return product;
@@ -179,7 +194,7 @@ export class PostgresCommerceStore implements CommerceStore {
 
   /** A product by its stable id. Unpublished products return `undefined`. */
   async getProductById(id: string): Promise<CommercialProduct | undefined> {
-    const catalog = await loadCatalog();
+    const catalog = await loadCatalog(this.prisma);
     const product = catalog.find((item) => item.id === id);
     if (!product || !canPublish(product)) return undefined;
     return product;
@@ -187,7 +202,7 @@ export class PostgresCommerceStore implements CommerceStore {
 
   /** Search published products by name, category, description or slug. */
   async searchProducts(query: string): Promise<readonly CommercialProduct[]> {
-    const catalog = await loadCatalog();
+    const catalog = await loadCatalog(this.prisma);
     const published = catalog.filter((product) =>
       canPublishInCatalog(product, catalog),
     );
@@ -213,7 +228,7 @@ export class PostgresCommerceStore implements CommerceStore {
   async filterByCategory(
     category: string,
   ): Promise<readonly CommercialProduct[]> {
-    const catalog = await loadCatalog();
+    const catalog = await loadCatalog(this.prisma);
     if (category === "all") return this.getPublishedProducts();
     return catalog.filter(
       (product) =>
@@ -224,7 +239,7 @@ export class PostgresCommerceStore implements CommerceStore {
 
   /** Validate the entire catalog for catalog-wide uniqueness and validity. */
   async validateCatalog(): Promise<{ valid: boolean; errors: string[] }> {
-    const catalog = await loadCatalog();
+    const catalog = await loadCatalog(this.prisma);
     return validateCatalog(catalog);
   }
 }
@@ -241,8 +256,3 @@ export function isValidPriceInput(price: unknown): price is Price {
 
 /** The recognized currency codes, re-exported for consumers. */
 export { CURRENCIES };
-
-/** Close the Prisma Client connection (useful in tests and teardown). */
-export async function disconnectPrisma(): Promise<void> {
-  await prisma.$disconnect();
-}
