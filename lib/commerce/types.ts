@@ -11,7 +11,7 @@
  * the catalog starts empty and is populated from a verified import template.
  */
 
-export type CurrencyCode = "USD" | "EUR" | "GBP";
+export type CurrencyCode = "USD" | "EUR" | "GBP" | "UGX";
 
 /** A price in the smallest currency unit (e.g. cents for USD). */
 export type Price = {

@@ -10,13 +10,13 @@
  */
 
 import type { CommercialProduct } from "./types";
-import { canPublish } from "./validation";
+import { canPublishInCatalog, validateCatalog } from "./validation";
 
 /** Data-access boundary for the commercial product catalog. */
 export interface CommerceStore {
   /** All commercial products in the catalog. */
   getAllProducts(): Promise<readonly CommercialProduct[]>;
-  /** Products cleared for purchase (validated and published). */
+  /** Products cleared for purchase (validated and published, catalog-safe). */
   getPublishedProducts(): Promise<readonly CommercialProduct[]>;
   /** A product by its stable slug. */
   getProductBySlug(slug: string): Promise<CommercialProduct | undefined>;
@@ -26,6 +26,8 @@ export interface CommerceStore {
   searchProducts(query: string): Promise<readonly CommercialProduct[]>;
   /** Filter published products by category. */
   filterByCategory(category: string): Promise<readonly CommercialProduct[]>;
+  /** Validate the entire catalog for catalog-wide uniqueness and validity. */
+  validateCatalog(): Promise<{ valid: boolean; errors: string[] }>;
 }
 
 /** In-memory commerce store backed by a static catalog array. */
@@ -41,7 +43,9 @@ export class MemoryCommerceStore implements CommerceStore {
   }
 
   async getPublishedProducts(): Promise<readonly CommercialProduct[]> {
-    return this.products.filter((product) => canPublish(product));
+    return this.products.filter((product) =>
+      canPublishInCatalog(product, this.products),
+    );
   }
 
   async getProductBySlug(
@@ -59,7 +63,7 @@ export class MemoryCommerceStore implements CommerceStore {
     if (!needle) return this.getPublishedProducts();
     return this.products.filter(
       (product) =>
-        canPublish(product) &&
+        canPublishInCatalog(product, this.products) &&
         [
           product.name,
           product.category,
@@ -78,8 +82,13 @@ export class MemoryCommerceStore implements CommerceStore {
     if (category === "all") return this.getPublishedProducts();
     return this.products.filter(
       (product) =>
-        canPublish(product) && product.category === category,
+        canPublishInCatalog(product, this.products) &&
+        product.category === category,
     );
+  }
+
+  async validateCatalog(): Promise<{ valid: boolean; errors: string[] }> {
+    return validateCatalog(this.products);
   }
 }
 

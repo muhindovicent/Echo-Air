@@ -6,6 +6,7 @@ import {
   validatePrice,
   validateProduct,
   validateVariant,
+  validateCatalog,
 } from "../../lib/commerce/validation.ts";
 import type { CommercialProduct, ProductVariant } from "../../lib/commerce/types.ts";
 
@@ -50,7 +51,7 @@ describe("commerce validation", () => {
     });
 
     it("accepts all recognized currencies", () => {
-      for (const currency of ["USD", "EUR", "GBP"]) {
+      for (const currency of ["USD", "EUR", "GBP", "UGX"]) {
         const result = validatePrice({ amount: 100, currency });
         assert.strictEqual(result.valid, true, `Expected ${currency} to be valid`);
       }
@@ -67,8 +68,7 @@ describe("commerce validation", () => {
       assert.strictEqual(result.valid, false);
     });
 
-    it("rejects zero as invalid amount", () => {
-      // Zero is actually valid (non-negative), so this tests it passes
+    it("accepts zero amount", () => {
       const result = validatePrice({ amount: 0, currency: "USD" });
       assert.strictEqual(result.valid, true);
     });
@@ -87,14 +87,8 @@ describe("commerce validation", () => {
     });
 
     it("rejects a price missing amount or currency", () => {
-      assert.strictEqual(
-        validatePrice({ currency: "USD" }).valid,
-        false,
-      );
-      assert.strictEqual(
-        validatePrice({ amount: 100 }).valid,
-        false,
-      );
+      assert.strictEqual(validatePrice({ currency: "USD" }).valid, false);
+      assert.strictEqual(validatePrice({ amount: 100 }).valid, false);
     });
   });
 
@@ -253,32 +247,32 @@ describe("commerce validation", () => {
     });
   });
 
-  describe("canPublishInCatalog (cross-product SKU uniqueness)", () => {
-  it("returns true when no SKU conflicts exist", () => {
-    const catalog: CommercialProduct[] = [
-      validProduct({ id: "p-1", slug: "p-1", variants: [validVariant({ sku: "EXISTING-001" })] }),
-    ];
-    const product = validProduct({
-      id: "p-2",
-      slug: "p-2",
-      publicationStatus: "published",
-      variants: [validVariant({ sku: "NEW-001" })],
+  describe("canPublishInCatalog cross-product conflicts (regression)", () => {
+    it("returns true when no SKU conflicts exist", () => {
+      const catalog: CommercialProduct[] = [
+        validProduct({ id: "p-1", slug: "slug-1", variants: [validVariant({ sku: "EXISTING-001" })] }),
+      ];
+      const product = validProduct({
+        id: "p-2",
+        slug: "slug-2",
+        publicationStatus: "published",
+        variants: [validVariant({ sku: "NEW-001" })],
+      });
+      assert.strictEqual(canPublishInCatalog(product, catalog), true);
     });
-    assert.strictEqual(canPublishInCatalog(product, catalog), true);
-  });
 
     it("returns false when a variant SKU conflicts with a published product", () => {
       const catalog: CommercialProduct[] = [
         validProduct({
           id: "p-1",
-          slug: "p-1",
+          slug: "slug-1",
           publicationStatus: "published",
           variants: [validVariant({ sku: "CONFLICT-001" })],
         }),
       ];
       const product = validProduct({
         id: "p-2",
-        slug: "p-2",
+        slug: "slug-2",
         publicationStatus: "published",
         variants: [validVariant({ sku: "CONFLICT-001" })],
       });
@@ -289,14 +283,14 @@ describe("commerce validation", () => {
       const catalog: CommercialProduct[] = [
         validProduct({
           id: "p-1",
-          slug: "p-1",
+          slug: "slug-1",
           publicationStatus: "published",
           variants: [validVariant({ sku: "OWN-001" })],
         }),
       ];
       const product = validProduct({
         id: "p-1",
-        slug: "p-1",
+        slug: "slug-1",
         publicationStatus: "published",
         variants: [validVariant({ sku: "OWN-001" })],
       });
@@ -310,6 +304,331 @@ describe("commerce validation", () => {
         price: { amount: -100, currency: "USD" },
       });
       assert.strictEqual(canPublishInCatalog(product, catalog), false);
+    });
+
+    it("returns false when multiple published products conflict on variant SKU", () => {
+      const catalog: CommercialProduct[] = [
+        validProduct({
+          id: "p-1",
+          slug: "slug-1",
+          publicationStatus: "published",
+          variants: [validVariant({ sku: "CONFLICT-SKU" })],
+        }),
+        validProduct({
+          id: "p-2",
+          slug: "slug-2",
+          publicationStatus: "published",
+          variants: [validVariant({ sku: "CONFLICT-SKU" })],
+        }),
+      ];
+      assert.strictEqual(canPublishInCatalog(catalog[0], catalog), false);
+      assert.strictEqual(canPublishInCatalog(catalog[1], catalog), false);
+    });
+
+    it("returns false when a product conflicts on product ID with a published product", () => {
+      const catalog: CommercialProduct[] = [
+        validProduct({
+          id: "shared-id",
+          slug: "slug-1",
+          publicationStatus: "published",
+          variants: [validVariant({ sku: "SKU-1" })],
+        }),
+        validProduct({
+          id: "shared-id",
+          slug: "slug-2",
+          publicationStatus: "published",
+          variants: [validVariant({ sku: "SKU-2" })],
+        }),
+      ];
+      const result = validateCatalog(catalog);
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("Product id") && e.includes("not unique")));
+    });
+
+    it("returns false when a product conflicts on product slug with a published product", () => {
+      const catalog: CommercialProduct[] = [
+        validProduct({
+          id: "p-1",
+          slug: "shared-slug",
+          publicationStatus: "published",
+          variants: [validVariant({ sku: "SKU-1" })],
+        }),
+      ];
+      const product = validProduct({
+        id: "p-2",
+        slug: "shared-slug",
+        publicationStatus: "published",
+        variants: [validVariant({ sku: "SKU-2" })],
+      });
+      assert.strictEqual(canPublishInCatalog(product, catalog), false);
+    });
+
+    it("returns false when a product conflicts on variant ID with a published product", () => {
+      const catalog: CommercialProduct[] = [
+        validProduct({
+          id: "p-1",
+          slug: "slug-1",
+          publicationStatus: "published",
+          variants: [validVariant({ id: "shared-vid", sku: "SKU-1" })],
+        }),
+      ];
+      const product = validProduct({
+        id: "p-2",
+        slug: "slug-2",
+        publicationStatus: "published",
+        variants: [validVariant({ id: "shared-vid", sku: "SKU-2" })],
+      });
+      assert.strictEqual(canPublishInCatalog(product, catalog), false);
+    });
+
+    it("ignores unpublished products when checking cross-product conflicts", () => {
+      const catalog: CommercialProduct[] = [
+        validProduct({
+          id: "p-1",
+          slug: "slug-1",
+          publicationStatus: "draft",
+          variants: [validVariant({ sku: "DRAFT-SKU" })],
+        }),
+      ];
+      const product = validProduct({
+        id: "p-2",
+        slug: "slug-2",
+        publicationStatus: "published",
+        variants: [validVariant({ sku: "DRAFT-SKU" })],
+      });
+      assert.strictEqual(canPublishInCatalog(product, catalog), true);
+    });
+  });
+
+  describe("catalog-wide uniqueness (regression)", () => {
+    it("rejects duplicate product IDs across the catalog", () => {
+      const result = validateCatalog([
+        validProduct({ id: "DUP-ID", slug: "slug-1" }),
+        validProduct({ id: "DUP-ID", slug: "slug-2" }),
+      ]);
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("Product id") && e.includes("not unique")));
+    });
+
+    it("rejects duplicate product slugs across the catalog", () => {
+      const result = validateCatalog([
+        validProduct({ id: "p-1", slug: "DUP-SLUG" }),
+        validProduct({ id: "p-2", slug: "DUP-SLUG" }),
+      ]);
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("Product slug") && e.includes("not unique")));
+    });
+
+    it("rejects duplicate variant IDs across the catalog", () => {
+      const result = validateCatalog([
+        validProduct({
+          id: "p-1",
+          slug: "slug-1",
+          variants: [validVariant({ id: "DUP-VID" })],
+        }),
+        validProduct({
+          id: "p-2",
+          slug: "slug-2",
+          variants: [validVariant({ id: "DUP-VID" })],
+        }),
+      ]);
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("Variant id") && e.includes("not unique")));
+    });
+
+    it("rejects duplicate variant SKUs across the catalog", () => {
+      const result = validateCatalog([
+        validProduct({
+          id: "p-1",
+          slug: "slug-1",
+          variants: [validVariant({ sku: "DUP-SKU" })],
+        }),
+        validProduct({
+          id: "p-2",
+          slug: "slug-2",
+          variants: [validVariant({ sku: "DUP-SKU" })],
+        }),
+      ]);
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("Variant SKU") && e.includes("not unique")));
+    });
+
+    it("accepts a catalog with all unique IDs, slugs, variant IDs and SKUs", () => {
+      const result = validateCatalog([
+        validProduct({
+          id: "p-1",
+          slug: "slug-1",
+          variants: [validVariant({ id: "vid-1", sku: "SKU-1" })],
+        }),
+        validProduct({
+          id: "p-2",
+          slug: "slug-2",
+          variants: [validVariant({ id: "vid-2", sku: "SKU-2" })],
+        }),
+      ]);
+      assert.strictEqual(result.valid, true);
+      assert.strictEqual(result.errors.length, 0);
+    });
+  });
+
+  describe("null and malformed variant safety (regression)", () => {
+    it("rejects a null variant in a product", () => {
+      const result = validateProduct(validProduct({
+        variants: [null as unknown as ProductVariant],
+      }));
+      assert.strictEqual(result.valid, false);
+    });
+
+    it("rejects a non-object variant in a product", () => {
+      const result = validateProduct(validProduct({
+        variants: ["not-a-variant" as unknown as ProductVariant],
+      }));
+      assert.strictEqual(result.valid, false);
+    });
+
+    it("rejects empty variant images array", () => {
+      const result = validateProduct(validProduct({
+        variants: [validVariant({ images: [] })],
+      }));
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("images")));
+    });
+
+    it("rejects variant images containing empty strings", () => {
+      const result = validateProduct(validProduct({
+        variants: [validVariant({ images: ["", "/concept/piece.jpg"] })],
+      }));
+      assert.strictEqual(result.valid, false);
+    });
+
+    it("rejects a variant with null id", () => {
+      const result = validateVariant(null);
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("Variant must be an object")));
+    });
+  });
+
+  describe("ISO timestamp validation (regression)", () => {
+    it("rejects empty createdAt", () => {
+      assert.strictEqual(validateProduct(validProduct({ createdAt: "" })).valid, false);
+    });
+
+    it("rejects non-ISO createdAt", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "not-a-timestamp" })).valid,
+        false,
+      );
+    });
+
+    it("rejects date-only createdAt (missing time)", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2026-01-01" })).valid,
+        false,
+      );
+    });
+
+    it("accepts valid ISO 8601 timestamps with timezone offset", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2026-01-01T00:00:00+03:00" })).valid,
+        true,
+      );
+    });
+
+    it("accepts valid ISO 8601 timestamps with fractional seconds", () => {
+      assert.strictEqual(
+        validateProduct(validProduct({ createdAt: "2026-01-01T00:00:00.123Z" })).valid,
+        true,
+      );
+    });
+
+    it("rejects empty updatedAt", () => {
+      assert.strictEqual(validateProduct(validProduct({ updatedAt: "" })).valid, false);
+    });
+  });
+
+  describe("negative final variant price (regression)", () => {
+    it("rejects a variant whose final price is negative", () => {
+      const result = validateProduct(validProduct({
+        price: { amount: 100, currency: "USD" },
+        variants: [validVariant({ priceAdjustment: -200 })],
+      }));
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("negative final price")));
+    });
+
+    it("accepts a variant whose final price is zero", () => {
+      const result = validateProduct(validProduct({
+        price: { amount: 100, currency: "USD" },
+        variants: [validVariant({ priceAdjustment: -100 })],
+      }));
+      assert.strictEqual(result.valid, true);
+    });
+
+    it("accepts a variant whose final price is positive", () => {
+      const result = validateProduct(validProduct({
+        price: { amount: 100, currency: "USD" },
+        variants: [validVariant({ priceAdjustment: 50 })],
+      }));
+      assert.strictEqual(result.valid, true);
+    });
+  });
+
+  describe("consistent inventory rule (regression)", () => {
+    it("rejects negative product inventory", () => {
+      const result = validateProduct(validProduct({ inventory: -1 }));
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("inventory")));
+    });
+
+    it("rejects negative variant inventory", () => {
+      const result = validateProduct(validProduct({
+        variants: [validVariant({ inventory: -1 })],
+      }));
+      assert.strictEqual(result.valid, false);
+      assert.ok(result.errors.some((e) => e.includes("inventory")));
+    });
+
+    it("rejects non-integer product inventory", () => {
+      const result = validateProduct(validProduct({ inventory: 2.5 }));
+      assert.strictEqual(result.valid, false);
+    });
+
+    it("rejects non-integer variant inventory", () => {
+      const result = validateProduct(validProduct({
+        variants: [validVariant({ inventory: 2.5 })],
+      }));
+      assert.strictEqual(result.valid, false);
+    });
+
+    it("accepts zero product inventory", () => {
+      const result = validateProduct(validProduct({ inventory: 0 }));
+      assert.strictEqual(result.valid, true);
+    });
+
+    it("accepts zero variant inventory", () => {
+      const result = validateProduct(validProduct({
+        variants: [validVariant({ inventory: 0 })],
+      }));
+      assert.strictEqual(result.valid, true);
+    });
+  });
+
+  describe("UGX currency support (regression)", () => {
+    it("accepts UGX as a valid currency", () => {
+      const result = validatePrice({ amount: 300000, currency: "UGX" });
+      assert.strictEqual(result.valid, true);
+    });
+
+    it("accepts a product priced in UGX", () => {
+      const result = validateProduct(validProduct({
+        price: { amount: 300000, currency: "UGX" },
+      }));
+      assert.strictEqual(result.valid, true);
+    });
+
+    it("rejects unknown currencies even with UGX supported", () => {
+      const result = validatePrice({ amount: 100, currency: "XYZ" });
+      assert.strictEqual(result.valid, false);
     });
   });
 
