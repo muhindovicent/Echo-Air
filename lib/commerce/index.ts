@@ -6,7 +6,7 @@ export type {
   PublicationStatus,
   PublishableProduct,
   ValidationResult,
-} from "./types";
+} from "./types.ts";
 export {
   CURRENCIES,
   ZERO_DECIMAL_CURRENCIES,
@@ -17,7 +17,8 @@ export {
   validateVariant,
   validateCatalog,
   isValidInventory,
+  deriveProductInventory,
   variantFinalPrice,
-} from "./validation";
-export type { CommerceStore } from "./store";
-export { MemoryCommerceStore, commercialCatalog, commerceStore } from "./store";
+} from "./validation.ts";
+export type { CommerceStore } from "./store.ts";
+export { MemoryCommerceStore, commercialCatalog, commerceStore } from "./store.ts";

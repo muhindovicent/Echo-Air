@@ -6,6 +6,9 @@
  * correctly typed and consistent with the rest of the catalog (e.g. unique
  * IDs, slugs, variant IDs and SKUs across products). Invalid records can
  * never be published.
+ *
+ * Validation is defensive: malformed products, null variants and invalid
+ * catalog records are rejected without throwing exceptions.
  */
 
 import type {
@@ -14,7 +17,7 @@ import type {
   Price,
   ProductVariant,
   ValidationResult,
-} from "./types";
+} from "./types.ts";
 
 /** Recognized ISO 4217 currency codes. */
 export const CURRENCIES: readonly CurrencyCode[] = ["USD", "EUR", "GBP", "UGX"];
@@ -52,14 +55,35 @@ function isValidImage(value: unknown): value is string {
   return typeof value === "string" && value.length > 0;
 }
 
-/** A valid ISO 8601 timestamp string. */
+/**
+ * A valid ISO 8601 timestamp value.
+ *
+ * Checks both the string format and that the value parses to a real date
+ * (rejects e.g. "2026-13-45T99:99:99Z" which matches the format but is not
+ * a real timestamp). JavaScript's Date is lenient (e.g. "2023-02-29" rolls
+ * over to March 1), so we verify the parsed date's month and day match the
+ * original to catch day/month overflow.
+ */
 function isValidIsoTimestamp(value: unknown): value is string {
   if (typeof value !== "string" || value.length === 0) return false;
-  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.test(value);
+  if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(\.\d+)?(Z|[+-]\d{2}:\d{2})$/.test(value)) {
+    return false;
+  }
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return false;
+
+  // Round-trip check for UTC timestamps only: re-serialize and compare the
+  // date portion to reject lenient rollovers like 2023-02-29 -> 2023-03-01.
+  // For offset timestamps, only validate parseability (offset shifts UTC date).
+  if (value.endsWith("Z") || !/[+-]\d{2}:\d{2}$/.test(value)) {
+    const iso = parsed.toISOString();
+    return iso.startsWith(value.slice(0, 10));
+  }
+
+  return true;
 }
 
-/** A valid inventory quantity: a non-negative integer. Applied consistently
- *  to both product-level and variant-level inventory. */
+/** A valid inventory quantity: a non-negative integer. */
 export function isValidInventory(value: unknown): value is number {
   return isValidNonNegativeInteger(value);
 }
@@ -67,6 +91,36 @@ export function isValidInventory(value: unknown): value is number {
 /** Type guard for a Price-shaped object. */
 function isPriceShape(value: unknown): value is { amount: unknown; currency: unknown } {
   return typeof value === "object" && value !== null;
+}
+
+/** Safely reads variants from a product, returning an empty array if missing
+ *  or malformed. Never throws. */
+function safeVariants(product: Record<string, unknown>): readonly unknown[] {
+  const variants = product.variants;
+  if (!Array.isArray(variants)) return [];
+  return variants;
+}
+
+/** Compute the final variant price in minor currency units. */
+export function variantFinalPrice(
+  basePrice: Price,
+  variant: Pick<ProductVariant, "priceAdjustment">,
+): number {
+  return basePrice.amount + variant.priceAdjustment;
+}
+
+/** Sum variant inventories to derive product-level inventory. */
+export function deriveProductInventory(
+  variants: readonly ProductVariant[],
+): number {
+  let total = 0;
+  for (const variant of variants) {
+    if (!variant || typeof variant !== "object") continue;
+    if (isValidInventory((variant as Record<string, unknown>).inventory)) {
+      total += (variant as Record<string, unknown>).inventory as number;
+    }
+  }
+  return total;
 }
 
 /** Validate a price record. */
@@ -89,14 +143,6 @@ export function validatePrice(price: unknown): ValidationResult {
   }
 
   return { valid: errors.length === 0, errors };
-}
-
-/** Compute the final variant price in minor currency units. */
-export function variantFinalPrice(
-  basePrice: Price,
-  variant: Pick<ProductVariant, "priceAdjustment">,
-): number {
-  return basePrice.amount + variant.priceAdjustment;
 }
 
 /** Validate a single variant. SKU uniqueness is checked against existing SKUs. */
@@ -183,8 +229,19 @@ export function validateProduct(
   const priceResult = validatePrice(p.price);
   errors.push(...priceResult.errors);
 
+  // Variant inventory is authoritative. Product inventory must equal the sum
+  // of all variant inventories.
+  const variants = safeVariants(p);
+  const variantInventoryTotal = deriveProductInventory(
+    variants as readonly ProductVariant[],
+  );
+
   if (!isValidInventory(p.inventory)) {
     errors.push("Product inventory must be a non-negative integer.");
+  } else if ((p.inventory as number) !== variantInventoryTotal) {
+    errors.push(
+      `Product inventory (${p.inventory}) does not equal the sum of variant inventories (${variantInventoryTotal}).`,
+    );
   }
 
   if (
@@ -194,11 +251,12 @@ export function validateProduct(
     errors.push('Product publicationStatus must be "draft", "published" or "unpublished".');
   }
 
+  const variantSkus: string[] = [];
+  const variantIds: string[] = [];
+
   if (!Array.isArray(p.variants) || p.variants.length === 0) {
     errors.push("Product must have at least one variant.");
   } else {
-    const variantSkus: string[] = [];
-    const variantIds: string[] = [];
     for (const variant of p.variants) {
       const variantResult = validateVariant(variant, [
         ...allSkus,
@@ -261,7 +319,11 @@ export function validateProduct(
   return { valid: errors.length === 0, errors };
 }
 
-/** Validate catalog-wide uniqueness of product IDs, slugs, variant IDs and SKUs. */
+/** Validate catalog-wide uniqueness of product IDs, slugs, variant IDs and SKUs.
+ *
+ * Defensive: malformed products, null variants and invalid catalog records
+ * are rejected without throwing exceptions.
+ */
 export function validateCatalog(
   catalog: readonly CommercialProduct[],
 ): ValidationResult {
@@ -273,42 +335,54 @@ export function validateCatalog(
   const seenVariantSkus = new Set<string>();
 
   for (const product of catalog) {
+    if (!product || typeof product !== "object") {
+      errors.push("Catalog contains a non-object product entry.");
+      continue;
+    }
+
+    const p = product as Record<string, unknown>;
+
     // Product ID uniqueness.
-    if (isValidSku(product.id)) {
-      if (seenProductIds.has(product.id)) {
-        errors.push(`Product id "${product.id}" is not unique across the catalog.`);
+    if (isValidSku(p.id)) {
+      if (seenProductIds.has(p.id)) {
+        errors.push(`Product id "${p.id}" is not unique across the catalog.`);
       }
-      seenProductIds.add(product.id);
+      seenProductIds.add(p.id);
     }
 
     // Product slug uniqueness.
-    if (isValidSku(product.slug)) {
-      if (seenProductSlugs.has(product.slug)) {
-        errors.push(`Product slug "${product.slug}" is not unique across the catalog.`);
+    if (isValidSku(p.slug)) {
+      if (seenProductSlugs.has(p.slug)) {
+        errors.push(`Product slug "${p.slug}" is not unique across the catalog.`);
       }
-      seenProductSlugs.add(product.slug);
+      seenProductSlugs.add(p.slug);
     }
 
     // Individual product validity.
     const productErrors = validateProduct(product).errors;
     for (const error of productErrors) {
-      errors.push(`[${product.slug ?? product.id}] ${error}`);
+      errors.push(`[${isValidSku(p.slug) ? p.slug : isValidSku(p.id) ? p.id : "unknown"}] ${error}`);
     }
 
-    // Variant-level uniqueness across catalog.
-    for (const variant of product.variants) {
-      if (isValidSku(variant.id)) {
-        if (seenVariantIds.has(variant.id)) {
-          errors.push(`Variant id "${variant.id}" is not unique across the catalog.`);
+    // Variant-level uniqueness across catalog (only for valid variants).
+    const variants = safeVariants(p);
+    for (const variant of variants) {
+      if (!variant || typeof variant !== "object") continue;
+
+      const v = variant as Record<string, unknown>;
+
+      if (isValidSku(v.id)) {
+        if (seenVariantIds.has(v.id)) {
+          errors.push(`Variant id "${v.id}" is not unique across the catalog.`);
         }
-        seenVariantIds.add(variant.id);
+        seenVariantIds.add(v.id);
       }
 
-      if (isValidSku(variant.sku)) {
-        if (seenVariantSkus.has(variant.sku)) {
-          errors.push(`Variant SKU "${variant.sku}" is not unique across the catalog.`);
+      if (isValidSku(v.sku)) {
+        if (seenVariantSkus.has(v.sku)) {
+          errors.push(`Variant SKU "${v.sku}" is not unique across the catalog.`);
         }
-        seenVariantSkus.add(variant.sku);
+        seenVariantSkus.add(v.sku);
       }
     }
   }
@@ -318,6 +392,7 @@ export function validateCatalog(
 
 /** Check whether a product is complete and verified enough to publish. */
 export function canPublish(product: CommercialProduct): boolean {
+  if (!product || typeof product !== "object") return false;
   if (product.publicationStatus !== "published") return false;
 
   const productResult = validateProduct(product);
@@ -337,6 +412,9 @@ export function canPublish(product: CommercialProduct): boolean {
  * - The product itself passes validation (canPublish).
  * - Cross-product uniqueness of product IDs, slugs, variant IDs and SKUs
  *   against already-published products.
+ *
+ * Different products that share an ID cannot bypass uniqueness validation:
+ * self-exclusion uses object reference equality, not ID equality.
  */
 export function canPublishInCatalog(
   product: CommercialProduct,
@@ -350,15 +428,18 @@ export function canPublishInCatalog(
   const otherPublishedVariantSkus = new Set<string>();
 
   for (const existing of catalog) {
-    // Skip self (same product ID) to allow re-publishing an existing product.
-    // Duplicate IDs across different products are caught by validateCatalog().
-    if (existing.id === product.id) continue;
+    if (!existing || typeof existing !== "object") continue;
+
+    // Skip self (same object reference) to allow re-publishing an existing
+    // product. Different products that share an ID are still conflicts.
+    if (existing === product) continue;
     if (existing.publicationStatus !== "published") continue;
 
     otherPublishedIds.add(existing.id);
     otherPublishedSlugs.add(existing.slug);
 
     for (const variant of existing.variants) {
+      if (!variant || typeof variant !== "object") continue;
       otherPublishedVariantIds.add(variant.id);
       otherPublishedVariantSkus.add(variant.sku);
     }
@@ -368,6 +449,7 @@ export function canPublishInCatalog(
   if (otherPublishedSlugs.has(product.slug)) return false;
 
   for (const variant of product.variants) {
+    if (!variant || typeof variant !== "object") continue;
     if (otherPublishedVariantIds.has(variant.id)) return false;
     if (otherPublishedVariantSkus.has(variant.sku)) return false;
   }

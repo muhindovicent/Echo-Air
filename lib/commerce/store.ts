@@ -10,7 +10,7 @@
  */
 
 import type { CommercialProduct } from "./types";
-import { canPublishInCatalog, validateCatalog } from "./validation";
+import { canPublishInCatalog, validateCatalog } from "./validation.ts";
 
 /** Data-access boundary for the commercial product catalog. */
 export interface CommerceStore {
