@@ -21,7 +21,9 @@ export async function GET(request: Request): Promise<Response> {
 
   try {
     let products: readonly CommercialProduct[];
-    if (category === "all") {
+    if (category && category !== "all" && query && query.trim()) {
+      products = await store.searchAndFilter(category, query);
+    } else if (category === "all") {
       products = query
         ? await store.searchProducts(query)
         : await store.getPublishedProducts();

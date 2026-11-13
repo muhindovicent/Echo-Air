@@ -2,7 +2,7 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, feat/phase-05b-postgresql-backend]
   pull_request:
     branches: [main]
 

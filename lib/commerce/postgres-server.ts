@@ -13,9 +13,15 @@
  *
  * No database credentials are stored here. Connection is configured through
  * the `DATABASE_URL` environment variable.
+ *
+ * A single shared Prisma Client is used across requests (see
+ * `lib/commerce/prisma-client.ts`). The store accepts an optional injected
+ * client (for tests) and falls back to the shared singleton otherwise. The
+ * client is never disconnected per request.
  */
 
 import { PrismaClient } from "@prisma/client";
+import { prisma } from "./prisma-client.ts";
 import type {
   CommercialProduct,
   CurrencyCode,
@@ -129,9 +135,9 @@ function mapProductToCommercialProduct(
  * database, mapped to `CommercialProduct` records.
  */
 async function loadCatalog(
-  prisma: PrismaClient,
+  prismaClient: PrismaClient,
 ): Promise<CommercialProduct[]> {
-  const rows = await prisma.product.findMany({
+  const rows = await prismaClient.product.findMany({
     include: {
       variants: {
         include: {
@@ -147,6 +153,73 @@ async function loadCatalog(
 }
 
 /**
+ * Filter catalog entries by category, returning only publishable products.
+ */
+function filterByCategoryFromCatalog(
+  catalog: readonly CommercialProduct[],
+  category: string,
+): CommercialProduct[] {
+  if (category === "all") {
+    return catalog as CommercialProduct[];
+  }
+  return catalog.filter(
+    (product) =>
+      canPublishInCatalog(product, catalog) && product.category === category,
+  ) as CommercialProduct[];
+}
+
+/**
+ * Filter catalog entries by a search query, returning only publishable
+ * products. Works independently of category filtering.
+ */
+function filterByQueryFromCatalog(
+  catalog: readonly CommercialProduct[],
+  query: string,
+): CommercialProduct[] {
+  const needle = query.trim().toLowerCase();
+  if (!needle) return catalog as CommercialProduct[];
+
+  return catalog.filter(
+    (product) =>
+      canPublishInCatalog(product, catalog) &&
+      [
+        product.name,
+        product.category,
+        product.description,
+        product.slug,
+      ]
+        .join(" ")
+        .toLowerCase()
+        .includes(needle),
+  ) as CommercialProduct[];
+}
+
+/**
+ * Apply both category and query filters together, returning only publishable
+ * products. Both filters must match.
+ */
+function filterByCategoryAndQueryFromCatalog(
+  catalog: readonly CommercialProduct[],
+  category: string,
+  query: string,
+): CommercialProduct[] {
+  const published = catalog.filter((product) =>
+    canPublishInCatalog(product, catalog),
+  ) as CommercialProduct[];
+
+  let filtered = published;
+  if (category && category !== "all") {
+    filtered = filtered.filter(
+      (product) => product.category === category,
+    );
+  }
+  if (query && query.trim()) {
+    filtered = filterByQueryFromCatalog(filtered, query);
+  }
+  return filtered;
+}
+
+/**
  * PostgreSQL-backed commerce store.
  *
  * Implements `CommerceStore` over a PostgreSQL database via Prisma. All
@@ -156,17 +229,16 @@ async function loadCatalog(
  * `getProductBySlug`, `getProductById`, `searchProducts` or
  * `filterByCategory`.
  *
- * A Prisma client is injected through the constructor so that the store can
- * be reused across requests without disconnecting between them. When no
- * client is supplied, the store creates its own client bound to
- * `DATABASE_URL`; constructing it does not require a database to be
- * reachable, but every query will fail clearly if the database is absent.
+ * A Prisma client is injected through the constructor so that tests can use
+ * an explicitly configured, isolated test database. When no client is
+ * supplied, the store uses the shared server-side singleton. The client is
+ * never disconnected per request.
  */
 export class PostgresCommerceStore implements CommerceStore {
   private prisma: PrismaClient;
 
   constructor(prismaClient?: PrismaClient) {
-    this.prisma = prismaClient ?? new PrismaClient();
+    this.prisma = prismaClient ?? prisma;
   }
 
   /** All commercial products in the catalog (unfiltered). */
@@ -179,7 +251,7 @@ export class PostgresCommerceStore implements CommerceStore {
     const catalog = await loadCatalog(this.prisma);
     return catalog.filter((product) =>
       canPublishInCatalog(product, catalog),
-    );
+    ) as CommercialProduct[];
   }
 
   /** A product by its stable slug. Unpublished products return `undefined`. */
@@ -203,25 +275,7 @@ export class PostgresCommerceStore implements CommerceStore {
   /** Search published products by name, category, description or slug. */
   async searchProducts(query: string): Promise<readonly CommercialProduct[]> {
     const catalog = await loadCatalog(this.prisma);
-    const published = catalog.filter((product) =>
-      canPublishInCatalog(product, catalog),
-    );
-
-    const needle = query.trim().toLowerCase();
-    if (!needle) return published;
-
-    return published.filter(
-      (product) =>
-        [
-          product.name,
-          product.category,
-          product.description,
-          product.slug,
-        ]
-          .join(" ")
-          .toLowerCase()
-          .includes(needle),
-    );
+    return filterByQueryFromCatalog(catalog, query);
   }
 
   /** Filter published products by category. */
@@ -229,12 +283,19 @@ export class PostgresCommerceStore implements CommerceStore {
     category: string,
   ): Promise<readonly CommercialProduct[]> {
     const catalog = await loadCatalog(this.prisma);
-    if (category === "all") return this.getPublishedProducts();
-    return catalog.filter(
-      (product) =>
-        canPublishInCatalog(product, catalog) &&
-        product.category === category,
-    );
+    return filterByCategoryFromCatalog(catalog, category);
+  }
+
+  /** Search and filter published products by query and category together.
+   *
+   * Both filters must match. Returns only publishable products.
+   */
+  async searchAndFilter(
+    category: string,
+    query: string,
+  ): Promise<readonly CommercialProduct[]> {
+    const catalog = await loadCatalog(this.prisma);
+    return filterByCategoryAndQueryFromCatalog(catalog, category, query);
   }
 
   /** Validate the entire catalog for catalog-wide uniqueness and validity. */

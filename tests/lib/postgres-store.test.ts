@@ -10,6 +10,9 @@
  * that tests use an explicitly configured, isolated test database and can
  * never accidentally access a production database.
  *
+ * Both `DATABASE_URL` and `DIRECT_URL` are set to the test database during
+ * migration tests so that schema changes never touch production.
+ *
  * Tests verify:
  * - Migrations apply cleanly against an isolated test database
  * - Product/variant/image relationships persist and load correctly
@@ -18,6 +21,7 @@
  * - Cross-product uniqueness (variant SKUs) blocks publication
  * - Product inventory is derived from variant inventory (source of truth)
  * - Read-only API responses exclude unpublished products
+ * - Search and category filters work together
  */
 
 import { describe, it, beforeEach, afterEach } from "node:test";
@@ -32,6 +36,20 @@ import { validateCatalog } from "../../lib/commerce/validation.ts";
 
 const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL;
 
+/** Safety guard: reject any database URL that targets a production database. */
+function assertTestDatabase(url: string | undefined, name: string): void {
+  if (!url) {
+    throw new Error(`${name} is not set`);
+  }
+  // The test database name must contain "_test" to ensure we never
+  // accidentally target a production database.
+  if (!url.includes("_test")) {
+    throw new Error(
+      `${name} does not target an isolated test database: ${url}`,
+    );
+  }
+}
+
 /** Skip all tests when no test database is configured. */
 if (!TEST_DATABASE_URL) {
   describe("commerce integration (PostgreSQL)", () => {
@@ -44,6 +62,9 @@ if (!TEST_DATABASE_URL) {
   describe("commerce integration (PostgreSQL)", () => {
     let prisma: PrismaClient;
 
+    // Safety: both DATABASE_URL and DIRECT_URL must point to the test DB.
+    assertTestDatabase(TEST_DATABASE_URL, "TEST_DATABASE_URL");
+
     async function truncateTables(): Promise<void> {
       await prisma.orderItem.deleteMany({});
       await prisma.order.deleteMany({});
@@ -54,10 +75,15 @@ if (!TEST_DATABASE_URL) {
     }
 
     describe("migrations", () => {
-      it("applies the schema migrations cleanly", () => {
+      it("applies the schema migrations cleanly against the test database", () => {
+        // Both DATABASE_URL and DIRECT_URL target the isolated test database.
         assert.doesNotThrow(() => {
           execSync("npx prisma migrate deploy", {
-            env: { ...process.env, DATABASE_URL: TEST_DATABASE_URL },
+            env: {
+              ...process.env,
+              DATABASE_URL: TEST_DATABASE_URL,
+              DIRECT_URL: TEST_DATABASE_URL,
+            },
             stdio: "pipe",
             timeout: 60000,
           });
@@ -530,6 +556,66 @@ if (!TEST_DATABASE_URL) {
         const results = await store.filterByCategory("outerwear");
         assert.strictEqual(results.length, 1);
         assert.strictEqual(results[0].slug, "filter-published");
+      });
+
+      it("searchAndFilter returns products matching both category and query", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "search-filter-published",
+            category: "outerwear",
+            name: "Published Searchable Coat",
+            description: "Published outerwear.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "SF-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "search-filter-draft",
+            category: "outerwear",
+            name: "Draft Searchable Coat",
+            description: "Draft outerwear.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "SF-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "search-filter-other-category",
+            category: "trousers",
+            name: "Published Trousers",
+            description: "Published trousers.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "SF-TR-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+
+        // Category filter only: returns 1 published outerwear product.
+        const byCategory = await store.filterByCategory("outerwear");
+        assert.strictEqual(byCategory.length, 1);
+        assert.strictEqual(byCategory[0].slug, "search-filter-published");
+
+        // Query filter only: returns 1 published coat product.
+        const byQuery = await store.searchProducts("coat");
+        assert.strictEqual(byQuery.length, 1);
+        assert.strictEqual(byQuery[0].slug, "search-filter-published");
+
+        // Combined: category=outerwear AND query="coat" returns 1 product.
+        const combined = await store.searchAndFilter("outerwear", "coat");
+        assert.strictEqual(combined.length, 1);
+        assert.strictEqual(combined[0].slug, "search-filter-published");
+
+        // Combined: category=outerwear AND query="trousers" returns 0 products.
+        const combinedEmpty = await store.searchAndFilter("outerwear", "trousers");
+        assert.strictEqual(combinedEmpty.length, 0);
       });
     });
   });
