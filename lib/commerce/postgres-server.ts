@@ -177,11 +177,13 @@ function filterByQueryFromCatalog(
   query: string,
 ): CommercialProduct[] {
   const needle = query.trim().toLowerCase();
-  if (!needle) return catalog as CommercialProduct[];
+  const published = catalog.filter((product) =>
+    canPublishInCatalog(product, catalog),
+  ) as CommercialProduct[];
+  if (!needle) return published;
 
-  return catalog.filter(
+  return published.filter(
     (product) =>
-      canPublishInCatalog(product, catalog) &&
       [
         product.name,
         product.category,

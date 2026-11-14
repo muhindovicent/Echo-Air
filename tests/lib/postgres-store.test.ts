@@ -36,16 +36,23 @@ import { validateCatalog } from "../../lib/commerce/validation.ts";
 
 const TEST_DATABASE_URL = process.env.TEST_DATABASE_URL;
 
-/** Safety guard: reject any database URL that targets a production database. */
+/** Safety guard: reject any database URL that targets a production database.
+ *
+ * The test database name (the last path segment before any query string)
+ * must contain "_test" to ensure we never accidentally target a production
+ * database.
+ */
 function assertTestDatabase(url: string | undefined, name: string): void {
   if (!url) {
     throw new Error(`${name} is not set`);
   }
-  // The test database name must contain "_test" to ensure we never
-  // accidentally target a production database.
-  if (!url.includes("_test")) {
+  // Extract the database name from the URL: the last path segment before ? or #
+  const dbNameMatch = url.match(/\/([^/?#]+)(?:[?#]|$)/);
+  const dbName = dbNameMatch ? dbNameMatch[1] : "";
+  if (!dbName.includes("_test")) {
     throw new Error(
-      `${name} does not target an isolated test database: ${url}`,
+      `${name} does not target an isolated test database: ${url} ` +
+        `(database name "${dbName}" does not contain "_test")`,
     );
   }
 }
