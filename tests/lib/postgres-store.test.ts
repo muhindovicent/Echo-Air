@@ -625,5 +625,160 @@ if (!TEST_DATABASE_URL) {
         assert.strictEqual(combinedEmpty.length, 0);
       });
     });
+
+    describe("publication restrictions — drafts never appear as purchasable", () => {
+      beforeEach(async () => {
+        prisma = new PrismaClient({
+          datasources: { db: { url: TEST_DATABASE_URL } },
+        });
+        await prisma.$connect();
+      });
+
+      afterEach(async () => {
+        await truncateTables();
+        await prisma.$disconnect();
+      });
+
+      it("empty search query returns only published products", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "empty-search-published",
+            category: "outerwear",
+            name: "Published Empty Search Coat",
+            description: "Published.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "ES-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "empty-search-draft",
+            category: "outerwear",
+            name: "Draft Empty Search Coat",
+            description: "Draft.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "ES-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+
+        // Empty query should return only published products.
+        const results = await store.searchProducts("");
+        assert.strictEqual(results.length, 1);
+        assert.strictEqual(results[0].slug, "empty-search-published");
+      });
+
+      it("category 'all' returns only published products", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "cat-all-published",
+            category: "outerwear",
+            name: "Published Category All Coat",
+            description: "Published.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "CA-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "cat-all-draft",
+            category: "outerwear",
+            name: "Draft Category All Coat",
+            description: "Draft.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "CA-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+
+        // category="all" should return only published products.
+        const allPublished = await store.filterByCategory("all");
+        assert.strictEqual(allPublished.length, 1);
+        assert.strictEqual(allPublished[0].slug, "cat-all-published");
+
+        // category="outerwear" should also return only published.
+        const byCategory = await store.filterByCategory("outerwear");
+        assert.strictEqual(byCategory.length, 1);
+        assert.strictEqual(byCategory[0].slug, "cat-all-published");
+      });
+
+      it("detail query (getProductBySlug) returns undefined for unpublished", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "detail-draft",
+            category: "outerwear",
+            name: "Draft Detail Coat",
+            description: "Draft.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "DD-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+        const product = await store.getProductBySlug("detail-draft");
+        assert.strictEqual(product, undefined, "unpublished product must not be returned by getProductBySlug");
+      });
+
+      it("draft products cannot leak through any published-product query", async () => {
+        await prisma.product.create({
+          data: {
+            slug: "leak-published",
+            category: "outerwear",
+            name: "Published Leak Coat",
+            description: "Published.",
+            basePriceAmount: 85000,
+            basePriceCurrency: "USD",
+            publicationStatus: "PUBLISHED",
+            variants: { create: [{ sku: "LEAK-PUB-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+        await prisma.product.create({
+          data: {
+            slug: "leak-draft",
+            category: "outerwear",
+            name: "Draft Leak Coat",
+            description: "Draft.",
+            basePriceAmount: 50000,
+            basePriceCurrency: "USD",
+            publicationStatus: "DRAFT",
+            variants: { create: [{ sku: "LEAK-DRAFT-M-BLK", size: "M", color: "Black", inventory: 5 }] },
+          },
+        });
+
+        const store = new PostgresCommerceStore(prisma);
+
+        // All publication queries must exclude drafts.
+        const published = await store.getPublishedProducts();
+        assert.strictEqual(published.length, 1);
+        assert.strictEqual(published[0].slug, "leak-published");
+
+        const searchResults = await store.searchProducts("coat");
+        assert.strictEqual(searchResults.length, 1);
+        assert.strictEqual(searchResults[0].slug, "leak-published");
+
+        const categoryResults = await store.filterByCategory("outerwear");
+        assert.strictEqual(categoryResults.length, 1);
+        assert.strictEqual(categoryResults[0].slug, "leak-published");
+
+        const combined = await store.searchAndFilter("outerwear", "coat");
+        assert.strictEqual(combined.length, 1);
+        assert.strictEqual(combined[0].slug, "leak-published");
+
+        const detail = await store.getProductBySlug("leak-draft");
+        assert.strictEqual(detail, undefined);
+      });
+    });
   });
 }

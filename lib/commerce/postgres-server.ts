@@ -159,12 +159,10 @@ function filterByCategoryFromCatalog(
   catalog: readonly CommercialProduct[],
   category: string,
 ): CommercialProduct[] {
-  if (category === "all") {
-    return catalog as CommercialProduct[];
-  }
   return catalog.filter(
     (product) =>
-      canPublishInCatalog(product, catalog) && product.category === category,
+      canPublishInCatalog(product, catalog) &&
+      (category === "all" || product.category === category),
   ) as CommercialProduct[];
 }
 
